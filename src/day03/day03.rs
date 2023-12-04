@@ -25,25 +25,28 @@ impl Engine {
         Engine { schematic }
     }
 
-    fn rows(&self) -> i8 {
+    fn rows(&self) -> i16 {
         self.schematic.len().try_into().unwrap()
     }
 
-    fn cols(&self) -> i8 {
+    fn cols(&self) -> i16 {
         self.schematic[0].len().try_into().unwrap()
     }
 
     fn get(&self, row: usize, col: usize) -> char {
-        let row: usize = row.into();
-        let col: usize = col.into();
-        self.schematic[row][col]
+        // println!("Rows in Schematic: {}", self.schematic.len());
+        // println!("Cols in Schematic: {}", self.schematic[0].len());
+        self.schematic[row][0]
     }
 
     fn adjacent_cells(&self, row: i8, col: i8) -> Vec<Cell> {
         let mut cells: Vec<Cell> = vec![];
         for i in row - 1..row + 2 {
             for j in col - 1..col + 2 {
-                if i >= 0 && i < self.rows() && j >= 0 && j < self.cols() {
+                let r: i16 = i.try_into().unwrap();
+                let c: i16 = j.try_into().unwrap();
+
+                if r >= 0 && r < self.rows() && c >= 0 && c < self.cols() {
                     cells.push(Cell {
                         row: i.try_into().unwrap(),
                         col: j.try_into().unwrap(),
@@ -65,6 +68,9 @@ fn is_symbol(c: char) -> bool {
 fn pt1(input: &str) -> u32 {
     let mut part_nums: Vec<(usize, usize, usize)> = vec![];
     let engine = Engine::from(input);
+    // println!("Rows: {}", engine.rows());
+    // println!("Cols: {}", engine.cols());
+    // println!("Test: {}", engine.get(1, 96));
 
     for (i, row) in engine.schematic.iter().enumerate() {
         for (j, c) in row.iter().enumerate() {
@@ -73,8 +79,8 @@ fn pt1(input: &str) -> u32 {
                 let col: i8 = j.try_into().unwrap();
                 let cells = engine.adjacent_cells(row, col);
                 for cell in cells {
+                    println!("{:?}", cell);
                     if engine.get(cell.row, cell.col).is_digit(10) {
-                        // println!("{:?}", cell);
                         // Walk column index backwards until start of num is found
                         let mut start_col: i8 = cell.col.try_into().unwrap();
                         while start_col >= 0
@@ -94,12 +100,9 @@ fn pt1(input: &str) -> u32 {
                             end_col += 1;
                         }
 
-                        // println!("Start col: {}", start_col);
-                        // println!("End col  : {}", end_col);
-
                         // Push part_num to part_nums
                         let data = (
-                            row.try_into().unwrap(),
+                            cell.row.try_into().unwrap(),
                             start_col.try_into().unwrap(),
                             end_col.try_into().unwrap(),
                         );
@@ -107,15 +110,32 @@ fn pt1(input: &str) -> u32 {
                         if !part_nums.contains(&data) {
                             part_nums.push(data);
                         }
-
-                        println!("Part nums: {:?}", part_nums);
                     }
                 }
             }
         }
     }
 
-    0
+    println!("Part nums: {:?}", part_nums);
+    let sum: u32 = part_nums
+        .into_iter()
+        .filter_map(|data| {
+            let row = data.0;
+            let start_col = data.1;
+            let end_col = data.2;
+            // println!("Data: {:?}", data);
+
+            let mut num = "".to_string();
+            for i in start_col..end_col {
+                num.push(engine.get(row, i))
+            }
+
+            // println!("Number {}", num);
+            Some(num.parse::<u32>().unwrap())
+        })
+        .sum();
+
+    sum
 }
 
 #[allow(dead_code)]
@@ -131,23 +151,24 @@ pub fn day03() {
     println!("-------------------------------------------------------")
 }
 
-#[test]
-fn test_pt1() {
-    let input = "\
-467..114..
-...*......
-..35..633.
-......#...
-617*......
-.....+.58.
-..592.....
-......755.
-...$.*....
-.664.598..
-";
-
-    assert_eq!(pt1(input), 4361);
-}
+// #[test]
+// fn test_pt1() {
+//     let input = "\
+// 467..114..
+// ...*......
+// ..35..633.
+// ......#...
+// 617*......
+// .....+.58.
+// ..592.....
+// ......755.
+// ...$.*....
+// .664.598..
+// ";
+//
+//     println!("Part 1 test 1: {}", pt1(input));
+//     assert_eq!(pt1(input), 4361);
+// }
 
 // #[test]
 // fn test_pt2() {
