@@ -1,0 +1,124 @@
+use crate::read_input;
+
+fn is_symbol(c: char) -> bool {
+    !(c.is_digit(10) || c == '.')
+}
+
+struct Engine {
+    schematic: Vec<Vec<char>>,
+    cols: usize,
+    sum: u32,
+}
+
+impl Engine {
+    fn from(input: &str) -> Self {
+        let mut schematic: Vec<Vec<char>> = vec![];
+        for line in input.lines() {
+            schematic.push(line.chars().collect::<Vec<char>>())
+        }
+        let cols = schematic.len();
+        let sum = 0;
+
+        Engine {
+            schematic,
+            cols,
+            sum,
+        }
+    }
+
+    fn get_part(&mut self, row: usize, col: usize) -> u32 {
+        let mut a: usize = 0;
+        let mut b: usize = 0;
+        let mut part = "".to_string();
+
+        while self.schematic[row][col - a].is_digit(10) {
+            a -= 1;
+        }
+
+        while self.schematic[row][col + b].is_digit(10) && col + b <= self.cols {
+            b += 1;
+        }
+
+        for i in col - a..col + b {
+            part.push(self.schematic[row][i]);
+            self.schematic[row][i] = '.';
+        }
+
+        part.parse::<u32>().unwrap()
+    }
+}
+
+fn pt1(input: &str) -> u32 {
+    let mut engine = Engine::from(input);
+
+    engine.sum = engine
+        .schematic
+        .iter()
+        .enumerate()
+        .filter_map(|(m, line)| {
+            let rsum: u32 = line
+                .into_iter()
+                .enumerate()
+                .filter_map(|(n, c)| {
+                    let csum: u32 = match is_symbol(*c) {
+                        true => {
+                            let mut accumulator: u32 = 0;
+                            for i in m - 1..m + 2 {
+                                for j in n - 1..n + 2 {
+                                    if engine.schematic[i][j].is_digit(10) {
+                                        accumulator += engine.get_part(i, j);
+                                    }
+                                }
+                            }
+
+                            accumulator
+                        }
+                        false => 0,
+                    };
+
+                    Some(csum)
+                })
+                .sum();
+
+            Some(rsum)
+        })
+        .sum();
+
+    engine.sum
+}
+
+#[allow(dead_code)]
+fn pt2(_input: &str) -> u32 {
+    0
+}
+
+pub fn day03() {
+    let input = read_input("./src/day02/puzzle_input.txt");
+    println!("Day 3:");
+    println!("Part 1: {}", pt1(&input));
+    // println!("Part 2: {}", pt2(&input));
+    println!("-------------------------------------------------------")
+}
+
+#[test]
+fn test_pt1() {
+    let input = "\
+467..114..
+...*......
+..35..633.
+......#...
+617*......
+.....+.58.
+..592.....
+......755.
+...$.*....
+.664.598..
+";
+
+    assert_eq!(pt1(input), 4361);
+}
+
+// #[test]
+// fn test_pt2() {
+//     unimplemented!()
+// }
