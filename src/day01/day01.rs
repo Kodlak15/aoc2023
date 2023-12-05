@@ -1,5 +1,4 @@
 // Advent of Code - Day 1:
-// Updated solution after drawing some inspiration from solutions shared on reddit
 
 use crate::read_input;
 
@@ -61,10 +60,10 @@ fn pt2(input: &str) -> u32 {
 }
 
 pub fn day01() {
-    let input = read_input("./src/day02/puzzle_input.txt");
+    let input = read_input("./src/day01/puzzle_input.txt");
     println!("Day 1:");
-    println!("Sum of calibration values (part 1): {}", pt1(&input));
-    println!("Sum of calibration values (part 2): {}", pt2(&input));
+    println!("Part 1: {}", pt1(&input));
+    println!("Part 2: {}", pt2(&input));
     println!("-------------------------------------------------------")
 }
 

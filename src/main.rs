@@ -3,6 +3,6 @@ use aoc2023::{day01::day01::day01, day02::day02::day02, day03::day03::day03, day
 fn main() {
     day01();
     day02();
-    // day03(); // TODO - didn't finish
+    day03();
     day04();
 }
