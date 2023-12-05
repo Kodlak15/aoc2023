@@ -10,7 +10,6 @@ struct Scratchcards {
     cards: Vec<String>,
 }
 
-#[allow(dead_code)]
 impl Scratchcards {
     fn from(input: &str) -> Self {
         let re = Regex::new(r"Card\s+\d+:").unwrap();
