@@ -47,10 +47,6 @@ impl Scratchcards {
 
         sum
     }
-
-    fn copies(&self, id: usize) -> u32 {
-        0
-    }
 }
 
 fn pt1(input: &str) -> u32 {
@@ -69,33 +65,26 @@ fn pt1(input: &str) -> u32 {
     points
 }
 
-// Number is too high
 fn pt2(input: &str) -> u32 {
-    let scratchcards = Scratchcards::from(input);
-    let mut n: usize = scratchcards.len() - 1;
+    let cards = Scratchcards::from(input);
+    let mut hmap: HashMap<usize, usize> =
+        (0..cards.len()).into_iter().map(|card| (card, 1)).collect();
 
-    // { N : (Copies, Value) }
-    let mut hmap: HashMap<usize, (usize, usize)> = HashMap::new();
-
-    while n > 0 {
-        let num_matches: usize = scratchcards.matches(n).try_into().unwrap();
-        let mut stack: Vec<usize> = (n + 1..scratchcards.len().min(n + num_matches + 1)).collect();
-
-        hmap.insert(n, (1, 1));
-        while stack.len() > 0 {
-            let id = stack.pop().unwrap();
-            let (mut c1, v1) = hmap[&id];
-            let (c2, v2) = hmap[&n];
-            c1 += 1;
-            hmap.insert(id, (c1, v1));
-            hmap.insert(n, (c2, v2 + (c1 * v1)));
+    for i in 0..cards.len() {
+        let m: usize = cards.matches(i).try_into().unwrap();
+        for j in i + 1..i + 1 + m {
+            if hmap.contains_key(&j) {
+                hmap.insert(j, hmap[&j] + hmap[&i]);
+            }
         }
-
-        n -= 1;
     }
 
-    println!("HashMap: {:?}", hmap);
-    hmap[&1].1.try_into().unwrap()
+    let sum: u32 = hmap
+        .values()
+        .map(|v| <usize as TryInto<u32>>::try_into(*v).unwrap())
+        .sum();
+
+    sum
 }
 
 pub fn day04() {
