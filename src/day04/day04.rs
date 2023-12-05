@@ -1,3 +1,5 @@
+// Advent of Code 2023 - Day 4:
+
 use std::collections::HashMap;
 
 use regex::Regex;
@@ -50,12 +52,12 @@ impl Scratchcards {
 }
 
 fn pt1(input: &str) -> u32 {
-    let scratchcards = Scratchcards::from(input);
+    let cards = Scratchcards::from(input);
 
     let base: u32 = 2;
     let mut points: u32 = 0;
-    for id in 0..scratchcards.len() {
-        let matches = scratchcards.matches(id);
+    for id in 0..cards.len() {
+        let matches = cards.matches(id);
         points += match matches > 0 {
             true => base.pow(matches - 1),
             false => 0,
