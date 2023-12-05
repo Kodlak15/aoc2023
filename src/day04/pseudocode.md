@@ -1,7 +1,7 @@
 # Advent of Code - Day 4, pt2
 ```
 # Counting all copies of cards attained given an n-card starting pile
-# Use HashMap { id: (count, value) } to keep track of results
+# Use HashMap { id: count } to keep track of results
 
 # Pseudocode:
 def pt2():
