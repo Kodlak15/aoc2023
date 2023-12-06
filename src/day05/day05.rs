@@ -132,10 +132,7 @@ fn pt2(input: &str) -> u64 {
         let mut length = seeds.pop().unwrap();
         let start = seeds.pop().unwrap();
 
-        println!("Start {:?}", start);
-
         while length > 0 {
-            println!("Length {:?}", length);
             let current = almanac.find_location_number(start + length);
             location_number = match current < location_number {
                 true => current,
@@ -144,17 +141,9 @@ fn pt2(input: &str) -> u64 {
 
             length -= 1
         }
-
-        println!("End loop");
     }
 
     location_number
-
-    // seeds
-    //     .iter()
-    //     .map(|seed| almanac.find_location_number(*seed))
-    //     .min()
-    //     .unwrap()
 }
 
 pub fn day05() {
