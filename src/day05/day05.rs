@@ -23,6 +23,9 @@ impl Almanac {
             .filter(|line| !line.is_empty())
             .collect();
 
+        // this is making my computer crash
+        // probably better to keep track of seeds outside of the implementation so that they can be
+        // handled differently depending on the function
         let seeds: Vec<u64> = match seed_ranges {
             true => {
                 let seeds: Vec<u64> = data
@@ -32,10 +35,6 @@ impl Almanac {
                     .split(" ")
                     .map(|num| num.parse::<u64>().unwrap())
                     .collect();
-
-                for i in seeds.chunks(2) {
-                    println!("Chunks {:?}", i)
-                }
 
                 seeds
                     .chunks(2)
