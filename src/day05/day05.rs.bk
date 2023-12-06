@@ -1,0 +1,176 @@
+// -------------------------------------------------------
+// Advent of Code 2023 - Day 5
+// -------------------------------------------------------
+
+use std::collections::HashMap;
+
+use crate::read_input;
+
+// -------------------------------------------------------
+// Custom data structures
+// -------------------------------------------------------
+
+struct Almanac {
+    seeds: Vec<u32>,
+    maps: HashMap<String, HashMap<u32, u32>>,
+}
+
+impl Almanac {
+    fn from(input: &str) -> Self {
+        let mut data: Vec<String> = input
+            .split("\n\n")
+            .map(|line| line.to_string())
+            .filter(|line| !line.is_empty())
+            .collect();
+
+        let seeds: Vec<u32> = data
+            .remove(0)
+            .strip_prefix("seeds: ")
+            .unwrap()
+            .split(" ")
+            .map(|num| num.parse::<u32>().unwrap())
+            .collect();
+
+        let mut maps: HashMap<String, HashMap<u32, u32>> = HashMap::new();
+        for group in data.iter() {
+            let mut group: Vec<String> = group.split(":\n").map(|s| s.to_string()).collect();
+            let key = group.remove(0).strip_suffix(" map").unwrap().to_string();
+            let mappings: Vec<String> = group
+                .remove(0)
+                .split("\n")
+                .map(|line| line.to_string())
+                .collect();
+
+            let mut groupmaps: HashMap<u32, u32> = HashMap::new();
+            for m in mappings {
+                let m: Vec<u32> = m.split(" ").map(|s| s.parse().unwrap()).collect();
+                let dest_start = m[0];
+                let source_start = m[1];
+                let length = m[2];
+
+                for i in 0..length {
+                    groupmaps.insert(source_start + i, dest_start + i);
+                }
+            }
+
+            maps.insert(key, groupmaps);
+        }
+
+        Self { seeds, maps }
+    }
+
+    fn find_location_number(&self, seed: u32) -> u32 {
+        let keys = [
+            "seed-to-soil".to_string(),
+            "soil-to-fertilizer".to_string(),
+            "fertilizer-to-water".to_string(),
+            "water-to-light".to_string(),
+            "light-to-temperature".to_string(),
+            "temperature-to-humidity".to_string(),
+            "humidity-to-location".to_string(),
+        ];
+
+        let mut m = &seed;
+        for key in keys {
+            // println!("m = {:?}", m);
+            m = match self.maps[&key].contains_key(m) {
+                true => &self.maps[&key][m],
+                false => m,
+            };
+        }
+        // println!("m = {:?}", m);
+        // println!("------------------------------");
+        *m
+    }
+}
+
+// -------------------------------------------------------
+// Main program logic
+// -------------------------------------------------------
+
+fn pt1(input: &str) -> u32 {
+    let almanac = Almanac::from(input);
+
+    // println!("Seed to soil map: {:?}", almanac.maps["seed-to-soil"][&50]);
+    //
+    // almanac.find_location_number(79);
+    //
+    // 0
+
+    almanac
+        .seeds
+        .iter()
+        .map(|seed| almanac.find_location_number(*seed))
+        .min()
+        .unwrap()
+}
+
+fn pt2(input: &str) -> u32 {
+    0
+}
+
+pub fn day05() {
+    let input = read_input("./src/day05/puzzle_input.txt");
+    println!("Day 5:");
+    println!("Part 1: {}", pt1(&input));
+    println!("Part 2: {}", pt2(&input));
+    println!("-------------------------------------------------------")
+}
+
+// -------------------------------------------------------
+// Tests
+// -------------------------------------------------------
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_pt1() {
+        let puzzle_input = "\
+seeds: 79 14 55 13
+
+seed-to-soil map:
+50 98 2
+52 50 48
+
+soil-to-fertilizer map:
+0 15 37
+37 52 2
+39 0 15
+
+fertilizer-to-water map:
+49 53 8
+0 11 42
+42 0 7
+57 7 4
+
+water-to-light map:
+88 18 7
+18 25 70
+
+light-to-temperature map:
+45 77 23
+81 45 19
+68 64 13
+
+temperature-to-humidity map:
+0 69 1
+1 0 69
+
+humidity-to-location map:
+60 56 37
+56 93 4\
+";
+
+        assert_eq!(pt1(puzzle_input), 35);
+    }
+
+    // #[test]
+    //     fn test_pt2() {
+    //         let puzzle_input = "\
+    // ";
+    //
+    //         // assert_eq!(pt2(puzzle_input), 30);
+    //     }
+}

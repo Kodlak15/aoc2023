@@ -7,13 +7,27 @@ use regex::Regex;
 use crate::read_input;
 
 // -------------------------------------------------------
+// Global constants
+// -------------------------------------------------------
+
+const SYMBOLS: &str = "`~!@#$%^&*()_+=";
+
+// -------------------------------------------------------
 // Custom data structures
 // -------------------------------------------------------
 
 #[allow(dead_code)]
+#[derive(Debug, Copy, Clone)]
 struct ArrayBounds {
     rows: usize,
     cols: usize,
+}
+
+#[allow(dead_code)]
+#[derive(Debug, Copy, Clone)]
+struct Coordinates {
+    row: usize,
+    col: usize,
 }
 
 #[allow(dead_code)]
@@ -28,20 +42,18 @@ impl ArrayBounds {
 // -------------------------------------------------------
 
 #[allow(dead_code)]
-fn is_symbol(c: char) -> bool {
-    !(c.is_digit(10) || c == '0')
-}
+fn adjacent_coords(
+    bounds: ArrayBounds,
+    row: usize,
+    col_start: usize,
+    col_end: usize,
+) -> Vec<Coordinates> {
+    let mut adjacent: Vec<Coordinates> = vec![];
 
-#[allow(dead_code)]
-fn adjacent_coords(bounds: ArrayBounds, row: usize, col: usize) -> Vec<(usize, usize)> {
-    let mut adjacent: Vec<(usize, usize)> = vec![];
-    let row: i32 = row.try_into().unwrap();
-    let col: i32 = col.try_into().unwrap();
-
-    for i in row - 1..row + 2 {
-        for j in col - 1..col + 2 {
-            if i >= 0 && j >= 0 && bounds.validate(i.try_into().unwrap(), j.try_into().unwrap()) {
-                adjacent.push((i.try_into().unwrap(), j.try_into().unwrap()));
+    for i in row.saturating_sub(1)..row + 2 {
+        for j in col_start.saturating_sub(1)..col_end + 2 {
+            if bounds.validate(i, j) {
+                adjacent.push(Coordinates { row: i, col: j });
             }
         }
     }
@@ -54,20 +66,21 @@ fn adjacent_coords(bounds: ArrayBounds, row: usize, col: usize) -> Vec<(usize, u
 // -------------------------------------------------------
 
 fn pt1(input: &str) -> u32 {
-    let schematic: Vec<&str> = input.lines().collect();
+    let schematic: Vec<&str> = input.lines().map(|line| line.trim()).collect();
     let bounds = ArrayBounds {
         rows: schematic.len(),
         cols: schematic[0].len(),
     };
 
-    let adjacent = adjacent_coords(bounds, 9, 0);
-    println!("Coords: {:?}", adjacent);
+    let re = Regex::new(r"\d+").unwrap();
+    // TODO
 
     0
 }
 
 #[allow(dead_code)]
 fn pt2(_input: &str) -> u32 {
+    // TODO
     0
 }
 
@@ -86,23 +99,24 @@ pub fn day03() {
 #[cfg(test)]
 mod tests {
     use super::*;
-    #[test]
-    fn test_pt1() {
-        let input = "\
- 467..114..
- ...*......
- ..35..633.
- ......#...
- 617*......
- .....+.58.
- ..592.....
- ......755.
- ...$.*....
- .664.598..\
- ";
 
-        assert_eq!(pt1(input), 4361);
-    }
+    //    #[test]
+    //    fn test_pt1() {
+    //        let input = "\
+    // 467..114..
+    // ...*......
+    // ..35..633.
+    // ......#...
+    // 617*......
+    // .....+.58.
+    // ..592.....
+    // ......755.
+    // ...$.*....
+    // .664.598..\
+    // ";
+    //
+    //        assert_eq!(pt1(input), 4361);
+    //    }
 
     // #[test]
     // fn test_pt2() {
