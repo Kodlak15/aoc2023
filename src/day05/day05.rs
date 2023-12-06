@@ -11,58 +11,11 @@ use crate::read_input;
 // -------------------------------------------------------
 
 struct Almanac {
-    seeds: Vec<u64>,
     maps: HashMap<String, Vec<(u64, u64, u64)>>,
 }
 
 impl Almanac {
-    fn from(input: &str, seed_ranges: bool) -> Self {
-        let mut data: Vec<String> = input
-            .split("\n\n")
-            .map(|line| line.to_string())
-            .filter(|line| !line.is_empty())
-            .collect();
-
-        // this is making my computer crash
-        // probably better to keep track of seeds outside of the implementation so that they can be
-        // handled differently depending on the function
-        let seeds: Vec<u64> = match seed_ranges {
-            true => {
-                let seeds: Vec<u64> = data
-                    .remove(0)
-                    .strip_prefix("seeds: ")
-                    .unwrap()
-                    .split(" ")
-                    .map(|num| num.parse::<u64>().unwrap())
-                    .collect();
-
-                seeds
-                    .chunks(2)
-                    .flat_map(|chunk| {
-                        let start = chunk[0];
-                        let length = chunk[1];
-
-                        (start..start + length).collect::<Vec<u64>>()
-                    })
-                    .collect()
-            }
-            false => data
-                .remove(0)
-                .strip_prefix("seeds: ")
-                .unwrap()
-                .split(" ")
-                .map(|num| num.parse::<u64>().unwrap())
-                .collect(),
-        };
-
-        // let seeds: Vec<u64> = data
-        //     .remove(0)
-        //     .strip_prefix("seeds: ")
-        //     .unwrap()
-        //     .split(" ")
-        //     .map(|num| num.parse::<u64>().unwrap())
-        //     .collect();
-
+    fn from(data: Vec<String>) -> Self {
         let mut maps: HashMap<String, Vec<(u64, u64, u64)>> = HashMap::new();
         for group in data.iter() {
             let mut group: Vec<String> = group.split(":\n").map(|s| s.to_string()).collect();
@@ -95,7 +48,7 @@ impl Almanac {
             maps.insert(key, ranges);
         }
 
-        Self { seeds, maps }
+        Self { maps }
     }
 
     fn find_location_number(&self, seed: u64) -> u64 {
@@ -134,10 +87,23 @@ impl Almanac {
 // -------------------------------------------------------
 
 fn pt1(input: &str) -> u64 {
-    let almanac = Almanac::from(input, false);
+    let mut data: Vec<String> = input
+        .split("\n\n")
+        .map(|line| line.to_string())
+        .filter(|line| !line.is_empty())
+        .collect();
 
-    almanac
-        .seeds
+    let seeds: Vec<u64> = data
+        .remove(0)
+        .strip_prefix("seeds: ")
+        .unwrap()
+        .split(" ")
+        .map(|num| num.parse::<u64>().unwrap())
+        .collect();
+
+    let almanac = Almanac::from(data);
+
+    seeds
         .iter()
         .map(|seed| almanac.find_location_number(*seed))
         .min()
@@ -145,14 +111,50 @@ fn pt1(input: &str) -> u64 {
 }
 
 fn pt2(input: &str) -> u64 {
-    let almanac = Almanac::from(input, true);
+    let mut data: Vec<String> = input
+        .split("\n\n")
+        .map(|line| line.to_string())
+        .filter(|line| !line.is_empty())
+        .collect();
 
-    almanac
-        .seeds
-        .iter()
-        .map(|seed| almanac.find_location_number(*seed))
-        .min()
+    let mut seeds: Vec<u64> = data
+        .remove(0)
+        .strip_prefix("seeds: ")
         .unwrap()
+        .split(" ")
+        .map(|num| num.parse::<u64>().unwrap())
+        .collect();
+
+    let almanac = Almanac::from(data);
+
+    let mut location_number: u64 = u64::MAX;
+    while !seeds.is_empty() {
+        let mut length = seeds.pop().unwrap();
+        let start = seeds.pop().unwrap();
+
+        println!("Start {:?}", start);
+
+        while length > 0 {
+            println!("Length {:?}", length);
+            let current = almanac.find_location_number(start + length);
+            location_number = match current < location_number {
+                true => current,
+                false => location_number,
+            };
+
+            length -= 1
+        }
+
+        println!("End loop");
+    }
+
+    location_number
+
+    // seeds
+    //     .iter()
+    //     .map(|seed| almanac.find_location_number(*seed))
+    //     .min()
+    //     .unwrap()
 }
 
 pub fn day05() {
