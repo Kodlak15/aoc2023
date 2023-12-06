@@ -16,20 +16,53 @@ struct Almanac {
 }
 
 impl Almanac {
-    fn from(input: &str) -> Self {
+    fn from(input: &str, seed_ranges: bool) -> Self {
         let mut data: Vec<String> = input
             .split("\n\n")
             .map(|line| line.to_string())
             .filter(|line| !line.is_empty())
             .collect();
 
-        let seeds: Vec<u64> = data
-            .remove(0)
-            .strip_prefix("seeds: ")
-            .unwrap()
-            .split(" ")
-            .map(|num| num.parse::<u64>().unwrap())
-            .collect();
+        let seeds: Vec<u64> = match seed_ranges {
+            true => {
+                let seeds: Vec<u64> = data
+                    .remove(0)
+                    .strip_prefix("seeds: ")
+                    .unwrap()
+                    .split(" ")
+                    .map(|num| num.parse::<u64>().unwrap())
+                    .collect();
+
+                for i in seeds.chunks(2) {
+                    println!("Chunks {:?}", i)
+                }
+
+                seeds
+                    .chunks(2)
+                    .flat_map(|chunk| {
+                        let start = chunk[0];
+                        let length = chunk[1];
+
+                        (start..start + length).collect::<Vec<u64>>()
+                    })
+                    .collect()
+            }
+            false => data
+                .remove(0)
+                .strip_prefix("seeds: ")
+                .unwrap()
+                .split(" ")
+                .map(|num| num.parse::<u64>().unwrap())
+                .collect(),
+        };
+
+        // let seeds: Vec<u64> = data
+        //     .remove(0)
+        //     .strip_prefix("seeds: ")
+        //     .unwrap()
+        //     .split(" ")
+        //     .map(|num| num.parse::<u64>().unwrap())
+        //     .collect();
 
         let mut maps: HashMap<String, Vec<(u64, u64, u64)>> = HashMap::new();
         for group in data.iter() {
@@ -102,7 +135,7 @@ impl Almanac {
 // -------------------------------------------------------
 
 fn pt1(input: &str) -> u64 {
-    let almanac = Almanac::from(input);
+    let almanac = Almanac::from(input, false);
 
     almanac
         .seeds
@@ -113,7 +146,14 @@ fn pt1(input: &str) -> u64 {
 }
 
 fn pt2(input: &str) -> u64 {
-    0
+    let almanac = Almanac::from(input, true);
+
+    almanac
+        .seeds
+        .iter()
+        .map(|seed| almanac.find_location_number(*seed))
+        .min()
+        .unwrap()
 }
 
 pub fn day05() {
