@@ -62,7 +62,6 @@ fn pt1(input: &str) -> u32 {
         .product()
 }
 
-#[allow(dead_code)]
 fn pt2(input: &str) -> u64 {
     let re = Regex::new(r"\d+").unwrap();
     let data: Vec<_> = input
