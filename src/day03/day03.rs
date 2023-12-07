@@ -10,6 +10,7 @@ use crate::read_input;
 // Global constants
 // -------------------------------------------------------
 
+#[allow(dead_code)]
 const SYMBOLS: &str = "`~!@#$%^&*()_+=";
 
 // -------------------------------------------------------
@@ -67,12 +68,12 @@ fn adjacent_coords(
 
 fn pt1(input: &str) -> u32 {
     let schematic: Vec<&str> = input.lines().map(|line| line.trim()).collect();
-    let bounds = ArrayBounds {
+    let _bounds = ArrayBounds {
         rows: schematic.len(),
         cols: schematic[0].len(),
     };
 
-    let re = Regex::new(r"\d+").unwrap();
+    let _re = Regex::new(r"\d+").unwrap();
     // TODO
 
     0
@@ -98,7 +99,7 @@ pub fn day03() {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
+    // use super::*;
 
     //    #[test]
     //    fn test_pt1() {
