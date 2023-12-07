@@ -10,7 +10,7 @@ use crate::read_input;
 // Custom Data Structures
 // -------------------------------------------------------
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, PartialOrd)]
 enum Hand {
     FiveOfAKind(String),
     FourOfAKind(String),
@@ -72,9 +72,24 @@ impl HandSet {
             })
             .collect();
 
-        println!("{:?}", hands);
-
         Self { hands }
+    }
+}
+
+// -------------------------------------------------------
+// Helper Functions
+// -------------------------------------------------------
+
+fn compare_hands(hand1: Hand, hand2: Hand) -> Hand {
+    match hand1 == hand2 {
+        true => match hand1(data) > hand2(data) {
+            true => hand1,
+            false => hand2,
+        },
+        false => match hand1 > hand2 {
+            true => hand1,
+            false => hand2,
+        }
     }
 }
 
@@ -85,6 +100,8 @@ impl HandSet {
 #[allow(dead_code)]
 fn pt1(input: &str) -> u32 {
     let hand_set = HandSet::from(input);
+
+    hand_set
 
     0
 }
