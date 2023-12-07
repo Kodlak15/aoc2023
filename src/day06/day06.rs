@@ -5,11 +5,7 @@
 use crate::read_input;
 
 // -------------------------------------------------------
-// Custom data structures
-// -------------------------------------------------------
-
-// -------------------------------------------------------
-// Main program logic
+// Math
 // -------------------------------------------------------
 
 // Let x = the number of whole ms the button is held down
@@ -17,9 +13,29 @@ use crate::read_input;
 // speed(x) = x mm/ms
 // time(n, x) = n - x ms
 // distance(n, x) = speed(x) * time(n, x) mm = x * (n - x) mm = x*n - x**2 mm
-//
 // d/dx distance(n, x) = n - 2*x
 // Global maxima at x = n/2
+
+// -------------------------------------------------------
+// Custom data structures
+// -------------------------------------------------------
+
+struct Races {
+    lengths: Vec<u32>,
+    records: Vec<u32>,
+}
+
+impl Race {
+    fn from(input: &str) -> Self {}
+}
+
+// -------------------------------------------------------
+// Helper Functions
+// -------------------------------------------------------
+
+// -------------------------------------------------------
+// Main program logic
+// -------------------------------------------------------
 
 fn pt1(input: &str) -> u32 {
     0
