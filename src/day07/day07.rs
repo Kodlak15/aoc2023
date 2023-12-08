@@ -74,8 +74,13 @@ impl Hand {
             })
             .into_iter()
             .max_by_key(|&(_, count)| count)
-            .map(|(c, _)| c)
-            .unwrap();
+            .map(|(c, _)| c);
+        // .unwrap();
+
+        let maxfreqcard = match maxfreqcard {
+            Some(c) => c,
+            None => 'W',
+        };
 
         let counts: Vec<u32> = cards
             .chars()
@@ -137,6 +142,7 @@ impl HandSet {
             .lines()
             .map(|line| line.split(" ").collect::<Vec<&str>>())
             .map(|pair| {
+                println!("Pair {:?}", pair);
                 let cards = Hand::from(pair[0].to_string());
                 let bid = pair[1].parse::<usize>().unwrap();
 
@@ -145,6 +151,8 @@ impl HandSet {
             .collect::<Vec<(Hand, usize)>>();
 
         hands.sort_by(|h1, h2| h2.0.partial_cmp(&h1.0).unwrap());
+
+        // we make it here safely
 
         Self { hands }
     }
@@ -167,10 +175,17 @@ fn pt1(input: &str) -> usize {
 }
 
 #[allow(dead_code)]
-fn pt2(input: &str) -> u32 {
+fn pt2(input: &str) -> usize {
     let hands = HandSet::from(input.replace("J", "W").as_str());
 
-    0
+    println!("WE HERE BOIIIII");
+
+    hands
+        .hands
+        .iter()
+        .enumerate()
+        .map(|(r, (_, bid))| (r + 1) * bid)
+        .sum()
 }
 
 pub fn day07() {
