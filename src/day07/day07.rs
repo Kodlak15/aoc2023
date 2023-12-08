@@ -139,37 +139,49 @@ impl HandSet {
 fn pt1(input: &str) -> u32 {
     let hand_set = HandSet::from(input);
 
-    let mut hmap: HashMap<&str, Vec<String>> = HashMap::new();
-    hmap.insert("FiveOfAKind", vec![]);
-    hmap.insert("FourOfAKind", vec![]);
-    hmap.insert("FullHouse", vec![]);
-    hmap.insert("ThreeOfAKind", vec![]);
-    hmap.insert("TwoPair", vec![]);
-    hmap.insert("OnePair", vec![]);
-    hmap.insert("HighCard", vec![]);
+    let hmap: HashMap<&str, Vec<String>> =
+        hand_set.hands.iter().fold(HashMap::new(), |mut acc, hand| {
+            match &hand.0 {
+                Hand::FiveOfAKind(cards) => {
+                    acc.entry("FiveOfAKind")
+                        .or_insert(Vec::new())
+                        .push(cards.clone());
+                }
+                Hand::FourOfAKind(cards) => {
+                    acc.entry("FourOfAKind")
+                        .or_insert(Vec::new())
+                        .push(cards.clone());
+                }
+                Hand::FullHouse(cards) => {
+                    acc.entry("FullHouse")
+                        .or_insert(Vec::new())
+                        .push(cards.clone());
+                }
+                Hand::ThreeOfAKind(cards) => {
+                    acc.entry("ThreeOfAKind")
+                        .or_insert(Vec::new())
+                        .push(cards.clone());
+                }
+                Hand::TwoPair(cards) => {
+                    acc.entry("TwoPair")
+                        .or_insert(Vec::new())
+                        .push(cards.clone());
+                }
+                Hand::OnePair(cards) => {
+                    acc.entry("OnePair")
+                        .or_insert(Vec::new())
+                        .push(cards.clone());
+                }
+                Hand::HighCard(cards) => {
+                    acc.entry("HighCard")
+                        .or_insert(Vec::new())
+                        .push(cards.clone());
+                }
+                _ => panic!("Invalid hand!"),
+            };
 
-    // hand_set.hands.iter().fold(
-    //     HashMap::new(),
-    //     |mut acc: HashMap<&str, Vec<String>>, hand| {
-    //         println!("{:?}", acc);
-    //
-    //         match &hand.0 {
-    //             Hand::OnePair(cards) => match acc.get("OnePair") {
-    //                 Some(v) => {
-    //                     v.push(cards.to_string());
-    //                 }
-    //                 None => {
-    //                     let mut v: Vec<String> = Vec::new();
-    //                     v.push(cards.to_string());
-    //                     acc.insert("OnePair", v);
-    //                 }
-    //             },
-    //             _ => panic!("Invalid hand!"),
-    //         };
-    //
-    //         acc
-    //     },
-    // );
+            acc
+        });
 
     0
 }
