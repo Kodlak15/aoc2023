@@ -7,6 +7,11 @@ use std::collections::HashMap;
 use crate::read_input;
 
 // -------------------------------------------------------
+// Global Variables
+// -------------------------------------------------------
+
+
+// -------------------------------------------------------
 // Custom Data Structures
 // -------------------------------------------------------
 
@@ -19,12 +24,11 @@ enum Hand {
     TwoPair(String),
     OnePair(String),
     HighCard(String),
-    Invalid,
 }
 
 impl Hand {
     fn from(cards: String) -> Self {
-        let mut counts: Vec<u32> = cards
+        let counts: Vec<u32> = cards
             .chars()
             .fold(HashMap::new(), |mut acc, c| {
                 *acc.entry(c).or_insert(0) += 1;
@@ -46,10 +50,20 @@ impl Hand {
             },
             4 => Self::OnePair(cards),
             5 => Self::HighCard(cards),
-            _ => {
-                panic!("Invalid hand!");
-                Self::Invalid
-            }
+            _ => panic!("Invalid hand!"),
+        }
+    }
+
+    fn cards(&self) -> &str {
+        match &self {
+            Self::FiveOfAKind(cards) => cards,
+            Self::FourOfAKind(cards) => cards,
+            Self::FullHouse(cards) => cards,
+            Self::ThreeOfAKind(cards) => cards,
+            Self::TwoPair(cards) => cards,
+            Self::OnePair(cards) => cards,
+            Self::HighCard(cards) => cards,
+            _ => panic!("Invalid hand!"),
         }
     }
 }
@@ -80,6 +94,8 @@ impl HandSet {
 // Helper Functions
 // -------------------------------------------------------
 
+fn compare_cards()
+
 fn compare_hands(hand1: Hand, hand2: Hand) -> Hand {
     match hand1 == hand2 {
         true => match hand1(data) > hand2(data) {
@@ -89,7 +105,7 @@ fn compare_hands(hand1: Hand, hand2: Hand) -> Hand {
         false => match hand1 > hand2 {
             true => hand1,
             false => hand2,
-        }
+        },
     }
 }
 
@@ -101,7 +117,7 @@ fn compare_hands(hand1: Hand, hand2: Hand) -> Hand {
 fn pt1(input: &str) -> u32 {
     let hand_set = HandSet::from(input);
 
-    hand_set
+    // hand_set
 
     0
 }

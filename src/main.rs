@@ -21,7 +21,7 @@ fn main() {
         Some(4) => day04(),
         Some(5) => day05(),
         Some(6) => day06(),
-        Some(6) => day07(),
+        Some(7) => day07(),
         Some(0) => {
             day01();
             day02();
