@@ -10,6 +10,9 @@ use crate::read_input;
 // Global Variables
 // -------------------------------------------------------
 
+const CARDS: [&str; 13] = [
+    "2", "3", "4", "5", "6", "7", "8", "9", "T", "J", "Q", "K", "A",
+];
 
 // -------------------------------------------------------
 // Custom Data Structures
@@ -94,7 +97,22 @@ impl HandSet {
 // Helper Functions
 // -------------------------------------------------------
 
-fn compare_cards()
+fn compare_cards(hand1: Hand, hand2: Hand) -> Hand {
+    let cards1 = hand1.cards();
+    let cards2 = hand2.cards();
+
+    cards1
+        .chars()
+        .zip(cards2.chars())
+        .map(|(c1, c2)| {
+            (
+                CARDS.iter().position(|c| c == c1),
+                CARDS.iter().position(|c| c == c2),
+            )
+        })
+        .take_while(|(x1, x2)| x1 != x2)
+        .last()
+}
 
 fn compare_hands(hand1: Hand, hand2: Hand) -> Hand {
     match hand1 == hand2 {
