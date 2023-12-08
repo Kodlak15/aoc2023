@@ -10,8 +10,8 @@ use crate::read_input;
 // Global Variables
 // -------------------------------------------------------
 
-const CARDS: [&str; 13] = [
-    "2", "3", "4", "5", "6", "7", "8", "9", "T", "J", "Q", "K", "A",
+const CARDS: [char; 13] = [
+    '2', '3', '4', '5', '6', '7', '8', '9', 'T', 'J', 'Q', 'K', 'A',
 ];
 
 // -------------------------------------------------------
@@ -97,35 +97,39 @@ impl HandSet {
 // Helper Functions
 // -------------------------------------------------------
 
-fn compare_cards(hand1: Hand, hand2: Hand) -> Hand {
-    let cards1 = hand1.cards();
-    let cards2 = hand2.cards();
-
-    cards1
-        .chars()
-        .zip(cards2.chars())
-        .map(|(c1, c2)| {
-            (
-                CARDS.iter().position(|c| c == c1),
-                CARDS.iter().position(|c| c == c2),
-            )
-        })
-        .take_while(|(x1, x2)| x1 != x2)
-        .last()
-}
-
-fn compare_hands(hand1: Hand, hand2: Hand) -> Hand {
-    match hand1 == hand2 {
-        true => match hand1(data) > hand2(data) {
-            true => hand1,
-            false => hand2,
-        },
-        false => match hand1 > hand2 {
-            true => hand1,
-            false => hand2,
-        },
-    }
-}
+// fn compare_cards<'a>(hand1: &'a Hand, hand2: &'a Hand) -> Option<&'a Hand> {
+//     let cards1 = hand1.cards();
+//     let cards2 = hand2.cards();
+//
+//     cards1
+//         .chars()
+//         .zip(cards2.chars())
+//         .map(|(c1, c2)| {
+//             (
+//                 CARDS.iter().position(|c| *c == c1),
+//                 CARDS.iter().position(|c| *c == c2),
+//             )
+//         })
+//         .take_while(|(x1, x2)| x1 != x2)
+//         .last()
+//         .map(|(x1, x2)| match x2 > x1 {
+//             true => hand2,
+//             false => hand1,
+//         })
+// }
+//
+// fn compare_hands<'a>(hand1: &'a Hand, hand2: &'a Hand) -> &'a Hand {
+//     match hand1 == hand2 {
+//         true => match compare_cards(hand1, hand2) {
+//             Some(hand) => hand,
+//             None => hand1,
+//         },
+//         false => match hand1 > hand2 {
+//             true => hand1,
+//             false => hand2,
+//         },
+//     }
+// }
 
 // -------------------------------------------------------
 // Main program logic
@@ -135,7 +139,37 @@ fn compare_hands(hand1: Hand, hand2: Hand) -> Hand {
 fn pt1(input: &str) -> u32 {
     let hand_set = HandSet::from(input);
 
-    // hand_set
+    let mut hmap: HashMap<&str, Vec<String>> = HashMap::new();
+    hmap.insert("FiveOfAKind", vec![]);
+    hmap.insert("FourOfAKind", vec![]);
+    hmap.insert("FullHouse", vec![]);
+    hmap.insert("ThreeOfAKind", vec![]);
+    hmap.insert("TwoPair", vec![]);
+    hmap.insert("OnePair", vec![]);
+    hmap.insert("HighCard", vec![]);
+
+    // hand_set.hands.iter().fold(
+    //     HashMap::new(),
+    //     |mut acc: HashMap<&str, Vec<String>>, hand| {
+    //         println!("{:?}", acc);
+    //
+    //         match &hand.0 {
+    //             Hand::OnePair(cards) => match acc.get("OnePair") {
+    //                 Some(v) => {
+    //                     v.push(cards.to_string());
+    //                 }
+    //                 None => {
+    //                     let mut v: Vec<String> = Vec::new();
+    //                     v.push(cards.to_string());
+    //                     acc.insert("OnePair", v);
+    //                 }
+    //             },
+    //             _ => panic!("Invalid hand!"),
+    //         };
+    //
+    //         acc
+    //     },
+    // );
 
     0
 }
