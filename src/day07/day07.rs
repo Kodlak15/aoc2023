@@ -25,6 +25,7 @@ enum Card {
     Four,
     Three,
     Two,
+    Joker,
 }
 
 impl Card {
@@ -43,6 +44,7 @@ impl Card {
             '4' => Self::Four,
             '3' => Self::Three,
             '2' => Self::Two,
+            'W' => Self::Joker,
             _ => panic!("Invalid card!"),
         }
     }
@@ -61,17 +63,38 @@ enum Hand {
 
 impl Hand {
     fn from(cards: String) -> Self {
+        let maxfreqcard = cards
+            .chars()
+            .fold(HashMap::new(), |mut acc, c| {
+                if c != 'W' {
+                    *acc.entry(c).or_insert(0) += 1;
+                }
+
+                acc
+            })
+            .into_iter()
+            .max_by_key(|&(_, count)| count)
+            .map(|(c, _)| c)
+            .unwrap();
+
         let counts: Vec<u32> = cards
             .chars()
             .fold(HashMap::new(), |mut acc, c| {
-                *acc.entry(c).or_insert(0) += 1;
+                match c == 'W' {
+                    true => *acc.entry(maxfreqcard).or_insert(0) += 1,
+                    false => *acc.entry(c).or_insert(0) += 1,
+                };
+
                 acc
             })
             .iter()
             .map(|(_, count)| count.to_string().parse::<u32>().unwrap())
             .collect();
 
-        let hand: Vec<Card> = cards.chars().map(|c| Card::from(c)).collect();
+        let mut hand: Vec<Card> = cards.chars().map(|c| Card::from(c)).collect();
+
+        // println!("Ma HAN {:?}", hand);
+        // println!("Ma COUNS {:?}", counts);
 
         match counts.len() {
             1 => Self::FiveOfAKind(hand),
@@ -144,7 +167,9 @@ fn pt1(input: &str) -> usize {
 }
 
 #[allow(dead_code)]
-fn pt2(_input: &str) -> u32 {
+fn pt2(input: &str) -> u32 {
+    let hands = HandSet::from(input.replace("J", "W").as_str());
+
     0
 }
 
@@ -179,10 +204,14 @@ QQQJA 483\
 
     #[test]
     fn test_pt2() {
-        let _puzzle_input = "\
-\
+        let puzzle_input = "\
+32T3K 765
+T55J5 684
+KK677 28
+KTJJT 220
+QQQJA 483\
 ";
 
-        // assert_eq!(pt2(puzzle_input), 71503);
+        assert_eq!(pt2(puzzle_input), 5905);
     }
 }
