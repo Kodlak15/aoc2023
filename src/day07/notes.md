@@ -17,13 +17,8 @@ Greatest value card gets rank 5 ... Lowest value card gets rank 1
 ```
 - Winnings are the sum of the products of each hands rank with the associated bid for that hand
 
-# Strategy
-
 # Notes
-
-h1 = "10"
-h2 = "0A"
-
-- This does not work :(
-h1 = (0 * 1) + (1 * 10) = 10
-h2 = (12 * 1) + (0 * 10) = 12
+- In Rust, you can implement PartialOrd on custom data structure (such as enums and structs) to get ordering behavior
+- Additionally, if you have one such data structure nested within another, Rust is able to use the ordering of the interior
+data structure to break any ties that occur in the parent 
+- In this particular case, I was able to sort my hands in ascending order, and the cards within were automatically handled when doing so
