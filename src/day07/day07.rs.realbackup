@@ -2,9 +2,17 @@
 // Advent of Code 2023 - Day 7
 // -------------------------------------------------------
 
-use std::collections::HashMap;
+use std::{cmp::Ordering, collections::HashMap};
 
 use crate::read_input;
+
+// -------------------------------------------------------
+// Global Variables
+// -------------------------------------------------------
+
+// const CARDS: [char; 13] = [
+//     '2', '3', '4', '5', '6', '7', '8', '9', 'T', 'J', 'Q', 'K', 'A',
+// ];
 
 // -------------------------------------------------------
 // Custom Data Structures
@@ -105,42 +113,76 @@ impl Hand {
 
 #[derive(Debug)]
 struct HandSet {
-    hands: Vec<(Hand, usize)>,
+    hands: Vec<(Hand, u32)>,
 }
 
 impl HandSet {
     fn from(input: &str) -> Self {
-        let mut hands: Vec<(Hand, usize)> = input
+        let mut hands: Vec<(Hand, u32)> = input
             .lines()
             .map(|line| line.split(" ").collect::<Vec<&str>>())
             .map(|pair| {
                 let cards = Hand::from(pair[0].to_string());
-                let bid = pair[1].parse::<usize>().unwrap();
+                let bid = pair[1].parse::<u32>().unwrap();
 
                 (cards, bid)
             })
-            .collect::<Vec<(Hand, usize)>>();
+            .collect::<Vec<(Hand, u32)>>();
 
-        hands.sort_by(|h1, h2| h2.0.partial_cmp(&h1.0).unwrap());
+        println!("Hands before sort: {:?}\n", hands);
+        hands.sort_by(|h1, h2| {
+            h2.0.partial_cmp(&h1.0).unwrap().then_with(|| {
+                let cards1 = h1.0.cards();
+                let cards2 = h2.0.cards();
+
+                for (c1, c2) in cards1.iter().zip(cards2.iter()) {
+                    if c1 > c2 {
+                        // return Ordering::Greater;
+                    } else if c1 < c2 {
+                        // return Ordering::Less;
+                    }
+                }
+
+                Ordering::Greater
+            })
+        });
+        println!("Hands after sort: {:?}\n", hands);
+
+        // hands.sort_by(|h1, h2| {
+        //     h2.0.partial_cmp(&h1.0)
+        //         .unwrap()
+        //         .then_with(|| h2.1.cmp(&h1.1))
+        // });
 
         Self { hands }
     }
 }
 
 // -------------------------------------------------------
+// Helper Functions
+// -------------------------------------------------------
+
+// fn card_value(card: char) -> usize {
+//     CARDS.iter().position(|c| *c == card).unwrap()
+// }
+
+// -------------------------------------------------------
 // Main program logic
 // -------------------------------------------------------
 
 #[allow(dead_code)]
-fn pt1(input: &str) -> usize {
+fn pt1(input: &str) -> u32 {
     let hands = HandSet::from(input);
+    // println!("Hands: {:?}", hands);
 
-    hands
-        .hands
-        .iter()
-        .enumerate()
-        .map(|(r, (_, bid))| (r + 1) * bid)
-        .sum()
+    0
+
+    // hand_set
+    //     .hands
+    //     .iter()
+    //     .enumerate()
+    //     .map(|(rank, (_, _, bid))| <usize as TryInto<u32>>::try_into(rank).unwrap() * *bid)
+    //     .sum()
 }
 
 #[allow(dead_code)]
@@ -173,6 +215,19 @@ KK677 28
 KTJJT 220
 QQQJA 483\
         ";
+
+        // assert_eq!(pt1(puzzle_input), 6440);
+    }
+
+    #[test]
+    fn test_pt1_ordering() {
+        let puzzle_input = "\
+88878 220
+87888 684
+88788 28
+78888 765
+88887 483\
+";
 
         assert_eq!(pt1(puzzle_input), 6440);
     }

@@ -10,7 +10,7 @@ A > K > Q > J > T > 9 > 8 > 7 > 6 > 5 > 4 > 3 > 2
 Example:
 77878 > 77788
 ```
-- Rank the cards in descending order
+- Rank the cards
 ```
 # If there are 5 cards:
 Greatest value card gets rank 5 ... Lowest value card gets rank 1
@@ -19,4 +19,11 @@ Greatest value card gets rank 5 ... Lowest value card gets rank 1
 
 # Strategy
 
+# Notes
 
+h1 = "10"
+h2 = "0A"
+
+- This does not work :(
+h1 = (0 * 1) + (1 * 10) = 10
+h2 = (12 * 1) + (0 * 10) = 12
