@@ -75,7 +75,6 @@ impl Hand {
             .into_iter()
             .max_by_key(|&(_, count)| count)
             .map(|(c, _)| c);
-        // .unwrap();
 
         let maxfreqcard = match maxfreqcard {
             Some(c) => c,
@@ -97,9 +96,6 @@ impl Hand {
             .collect();
 
         let mut hand: Vec<Card> = cards.chars().map(|c| Card::from(c)).collect();
-
-        // println!("Ma HAN {:?}", hand);
-        // println!("Ma COUNS {:?}", counts);
 
         match counts.len() {
             1 => Self::FiveOfAKind(hand),
@@ -142,7 +138,6 @@ impl HandSet {
             .lines()
             .map(|line| line.split(" ").collect::<Vec<&str>>())
             .map(|pair| {
-                println!("Pair {:?}", pair);
                 let cards = Hand::from(pair[0].to_string());
                 let bid = pair[1].parse::<usize>().unwrap();
 
@@ -151,8 +146,6 @@ impl HandSet {
             .collect::<Vec<(Hand, usize)>>();
 
         hands.sort_by(|h1, h2| h2.0.partial_cmp(&h1.0).unwrap());
-
-        // we make it here safely
 
         Self { hands }
     }
@@ -177,8 +170,6 @@ fn pt1(input: &str) -> usize {
 #[allow(dead_code)]
 fn pt2(input: &str) -> usize {
     let hands = HandSet::from(input.replace("J", "W").as_str());
-
-    println!("WE HERE BOIIIII");
 
     hands
         .hands
@@ -212,7 +203,7 @@ T55J5 684
 KK677 28
 KTJJT 220
 QQQJA 483\
-        ";
+";
 
         assert_eq!(pt1(puzzle_input), 6440);
     }

@@ -19,6 +19,5 @@ Greatest value card gets rank 5 ... Lowest value card gets rank 1
 
 # Notes
 - In Rust, you can implement PartialOrd on custom data structure (such as enums and structs) to get ordering behavior
-- Additionally, if you have one such data structure nested within another, Rust is able to use the ordering of the interior
-data structure to break any ties that occur in the parent 
+- Additionally, if you have one such data structure nested within another, Rust is able to use the ordering of the interior data structure to break any ties that occur in the parent 
 - In this particular case, I was able to sort my hands in ascending order, and the cards within were automatically handled when doing so
