@@ -155,7 +155,6 @@ impl HandSet {
 // Main program logic
 // -------------------------------------------------------
 
-#[allow(dead_code)]
 fn pt1(input: &str) -> usize {
     let hands = HandSet::from(input);
 
@@ -167,7 +166,6 @@ fn pt1(input: &str) -> usize {
         .sum()
 }
 
-#[allow(dead_code)]
 fn pt2(input: &str) -> usize {
     let hands = HandSet::from(input.replace("J", "W").as_str());
 
