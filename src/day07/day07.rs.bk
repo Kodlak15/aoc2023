@@ -73,30 +73,21 @@ impl Hand {
 
 #[derive(Debug)]
 struct HandSet {
-    hands: Vec<(Hand, u32, u32)>,
+    hands: Vec<(Hand, u32)>,
 }
 
 impl HandSet {
     fn from(input: &str) -> Self {
-        let mut hands: Vec<(Hand, u32, u32)> = input
+        let hands: Vec<(Hand, u32)> = input
             .lines()
             .map(|line| line.split(" ").collect::<Vec<&str>>())
             .map(|pair| {
-                let cards = Hand::from(pair[0].to_string());
-                let value = hand_value(cards.cards());
-                let bid = pair[1].parse::<u32>().unwrap();
-
-                (cards, value, bid)
+                (
+                    Hand::from(pair[0].to_string()),
+                    pair[1].parse::<u32>().unwrap(),
+                )
             })
-            .collect::<Vec<(Hand, u32, u32)>>();
-
-        hands.sort_by(|h1, h2| {
-            h1.0.partial_cmp(&h2.0)
-                .unwrap()
-                .then_with(|| h2.1.cmp(&h1.1))
-        });
-
-        println!("Hands: {:?}", hands);
+            .collect();
 
         Self { hands }
     }
@@ -106,19 +97,46 @@ impl HandSet {
 // Helper Functions
 // -------------------------------------------------------
 
+// fn compare_cards<'a>(hand1: &'a Hand, hand2: &'a Hand) -> Option<&'a Hand> {
+//     let cards1 = hand1.cards();
+//     let cards2 = hand2.cards();
+//
+//     cards1
+//         .chars()
+//         .zip(cards2.chars())
+//         .map(|(c1, c2)| {
+//             (
+//                 CARDS.iter().position(|c| *c == c1),
+//                 CARDS.iter().position(|c| *c == c2),
+//             )
+//         })
+//         .take_while(|(x1, x2)| x1 != x2)
+//         .last()
+//         .map(|(x1, x2)| match x2 > x1 {
+//             true => hand2,
+//             false => hand1,
+//         })
+// }
+//
+// fn compare_hands<'a>(hand1: &'a Hand, hand2: &'a Hand) -> &'a Hand {
+//     match hand1 == hand2 {
+//         true => match compare_cards(hand1, hand2) {
+//             Some(hand) => hand,
+//             None => hand1,
+//         },
+//         false => match hand1 > hand2 {
+//             true => hand1,
+//             false => hand2,
+//         },
+//     }
+// }
+
 fn card_value(card: char) -> usize {
     CARDS.iter().position(|c| *c == card).unwrap()
 }
 
-fn hand_value(cards: &str) -> u32 {
-    cards
-        .chars()
-        .map(|card| card_value(card))
-        .map(|x| x.to_string())
-        .collect::<Vec<String>>()
-        .concat()
-        .parse::<u32>()
-        .unwrap()
+fn hand_value(cards: Vec<char>) -> u32 {
+
 }
 
 // -------------------------------------------------------
@@ -173,9 +191,9 @@ fn pt1(input: &str) -> u32 {
             acc
         });
 
-    // for key in hmap.keys() {
-    //     println!("{}", key)
-    // }
+    for key in hmap.keys() {
+        println!("{}", key)
+    }
 
     0
 }
