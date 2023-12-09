@@ -25,7 +25,6 @@ fn pt1(input: &str) -> usize {
                 .map(|c| c.parse::<usize>().expect("Unable to parse character!"))
                 .collect()];
 
-            println!("History: {:?}", history);
             while history[history.len() - 1].iter().any(|x| *x != 0) {
                 let last = &history[history.len() - 1];
 
@@ -39,7 +38,14 @@ fn pt1(input: &str) -> usize {
                     .collect();
 
                 history.push(next);
-                println!("History: {:?}", history);
+            }
+
+            for (i, seq) in history.iter().enumerate().rev() {
+                let n = history[i].len();
+                let v = history[i][n] + history[i - 1][n];
+
+                // Cannot edit history as we are iterating over it (this way at least)
+                history[i].push(v);
             }
 
             0
