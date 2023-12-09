@@ -55,6 +55,17 @@ fn next_instruction(instructions: &String, n: usize) -> char {
         .expect("Failed to get next instruction!")
 }
 
+fn least_common_multiple(v: Vec<usize>) -> usize {
+    let max = v
+        .iter()
+        .max()
+        .expect("Maximum value in v could not be calculated!");
+
+    (1..max).iter();
+
+    0
+}
+
 // -------------------------------------------------------
 // Main Program Logic
 // -------------------------------------------------------
@@ -82,7 +93,44 @@ fn pt1(input: &str) -> usize {
 }
 
 fn pt2(input: &str) -> usize {
-    0
+    let map = Map::from(input);
+
+    let mut n = 0;
+    let v: Vec<usize> = Vec::new();
+    let mut instruction = next_instruction(&map.instructions, n);
+
+    let mut nodes: Vec<String> = map
+        .nodes
+        .keys()
+        .filter_map(|node| match node.ends_with('A') {
+            true => Some(node.to_string()),
+            false => None,
+        })
+        .collect();
+
+    // while nodes.iter().any(|node| node.ends_with('Z') == false) {
+    //     let mut next_nodes: Vec<String> = Vec::new();
+    //
+    //     while !nodes.is_empty() {
+    //         let node = match instruction {
+    //             'L' => map.nodes[&nodes.pop().expect("Could not unpack value in node")]
+    //                 .0
+    //                 .clone(),
+    //             'R' => map.nodes[&nodes.pop().expect("Could not unpack value in node")]
+    //                 .1
+    //                 .clone(),
+    //             _ => panic!("Invalid instruction!"),
+    //         };
+    //
+    //         next_nodes.push(node);
+    //     }
+    //
+    //     nodes = next_nodes;
+    //     n += 1;
+    //     instruction = next_instruction(&map.instructions, n);
+    // }
+
+    least_common_multiple(v)
 }
 
 pub fn day08() {
@@ -144,7 +192,7 @@ LR
 22C = (22Z, 22Z)
 22Z = (22B, 22B)
 XXX = (XXX, XXX)\
-    ";
+";
 
         assert_eq!(pt2(puzzle_input), 6);
     }
