@@ -55,13 +55,19 @@ fn next_instruction(instructions: &String, n: usize) -> char {
         .expect("Failed to get next instruction!")
 }
 
-fn least_common_multiple(v: Vec<usize>) -> usize {
-    let mut lcm = 2;
-    while !v.iter().all(|x| lcm % x == 0) {
-        lcm += 1;
+fn least_common_multiple(v: &mut Vec<usize>) -> usize {
+    let v0 = v.clone();
+
+    while !v.iter().all(|x| *x == v[0]) {
+        let min = v.iter().min().expect("Failed to unpack min of v!");
+        let idx = v
+            .iter()
+            .position(|x| x == min)
+            .expect("Could not unpack index of min of v!");
+        v[idx] += v0[idx];
     }
 
-    lcm
+    v[0]
 }
 
 // -------------------------------------------------------
@@ -102,10 +108,10 @@ fn pt2(input: &str) -> usize {
         })
         .collect();
 
-    // let lcm = least_common_multiple(vec![8, 9, 21]);
+    // let lcm = least_common_multiple(&mut vec![8, 9, 21]);
     // println!("LCM: {:?}", lcm);
 
-    let v: Vec<usize> = nodes
+    let mut v: Vec<usize> = nodes
         .iter()
         .map(|node| {
             let mut n = 0;
@@ -127,8 +133,7 @@ fn pt2(input: &str) -> usize {
         })
         .collect();
 
-    println!("Computing LCM...");
-    least_common_multiple(v)
+    least_common_multiple(&mut v)
 }
 
 pub fn day08() {
