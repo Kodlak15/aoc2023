@@ -56,14 +56,12 @@ fn next_instruction(instructions: &String, n: usize) -> char {
 }
 
 fn least_common_multiple(v: Vec<usize>) -> usize {
-    let max = v
-        .iter()
-        .max()
-        .expect("Maximum value in v could not be calculated!");
+    let mut lcm = 2;
+    while !v.iter().all(|x| lcm % x == 0) {
+        lcm += 1;
+    }
 
-    (1..max).iter();
-
-    0
+    lcm
 }
 
 // -------------------------------------------------------
@@ -95,11 +93,7 @@ fn pt1(input: &str) -> usize {
 fn pt2(input: &str) -> usize {
     let map = Map::from(input);
 
-    let mut n = 0;
-    let v: Vec<usize> = Vec::new();
-    let mut instruction = next_instruction(&map.instructions, n);
-
-    let mut nodes: Vec<String> = map
+    let nodes: Vec<String> = map
         .nodes
         .keys()
         .filter_map(|node| match node.ends_with('A') {
@@ -108,28 +102,32 @@ fn pt2(input: &str) -> usize {
         })
         .collect();
 
-    // while nodes.iter().any(|node| node.ends_with('Z') == false) {
-    //     let mut next_nodes: Vec<String> = Vec::new();
-    //
-    //     while !nodes.is_empty() {
-    //         let node = match instruction {
-    //             'L' => map.nodes[&nodes.pop().expect("Could not unpack value in node")]
-    //                 .0
-    //                 .clone(),
-    //             'R' => map.nodes[&nodes.pop().expect("Could not unpack value in node")]
-    //                 .1
-    //                 .clone(),
-    //             _ => panic!("Invalid instruction!"),
-    //         };
-    //
-    //         next_nodes.push(node);
-    //     }
-    //
-    //     nodes = next_nodes;
-    //     n += 1;
-    //     instruction = next_instruction(&map.instructions, n);
-    // }
+    // let lcm = least_common_multiple(vec![8, 9, 21]);
+    // println!("LCM: {:?}", lcm);
 
+    let v: Vec<usize> = nodes
+        .iter()
+        .map(|node| {
+            let mut n = 0;
+            let mut instruction = next_instruction(&map.instructions, n);
+            let mut current_node = node.clone();
+
+            while !current_node.ends_with('Z') {
+                current_node = match instruction {
+                    'L' => map.nodes[&current_node].0.clone(),
+                    'R' => map.nodes[&current_node].1.clone(),
+                    _ => panic!("Invalid instruction!"),
+                };
+
+                n += 1;
+                instruction = next_instruction(&map.instructions, n);
+            }
+
+            n
+        })
+        .collect();
+
+    println!("Computing LCM...");
     least_common_multiple(v)
 }
 
