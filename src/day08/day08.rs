@@ -108,9 +108,6 @@ fn pt2(input: &str) -> usize {
         })
         .collect();
 
-    // let lcm = least_common_multiple(&mut vec![8, 9, 21]);
-    // println!("LCM: {:?}", lcm);
-
     let mut v: Vec<usize> = nodes
         .iter()
         .map(|node| {
