@@ -5,14 +5,6 @@
 use crate::read_input;
 
 // -------------------------------------------------------
-// Custom Data Structures
-// -------------------------------------------------------
-
-// -------------------------------------------------------
-// Helper Functions
-// -------------------------------------------------------
-
-// -------------------------------------------------------
 // Main Program Logic
 // -------------------------------------------------------
 
@@ -79,16 +71,13 @@ fn pt2(input: &str) -> i32 {
                 history.push(next);
             }
 
-            // New logic goes here
-
             let mut values: Vec<i32> = Vec::new();
             values.push(0);
 
             for (i, _) in history.iter().enumerate().rev().skip(1) {
                 let seq = &history[i];
-                let m = seq.len();
 
-                values.push(seq[m - 1] + values[values.len() - 1])
+                values.push(seq[0] - values[values.len() - 1])
             }
 
             values[values.len() - 1]
