@@ -16,19 +16,25 @@ use crate::read_input;
 // Main Program Logic
 // -------------------------------------------------------
 
-fn pt1(input: &str) -> usize {
-    let sequences: usize = input
+fn pt1(input: &str) -> i32 {
+    input
         .lines()
         .map(|line| {
-            let mut history: Vec<Vec<usize>> = vec![line
+            let mut history: Vec<Vec<i32>> = vec![line
                 .split(" ")
-                .map(|c| c.parse::<usize>().expect("Unable to parse character!"))
+                .map(|c| {
+                    {
+                        println!("c = {:?}", c);
+                        c.parse::<i32>()
+                    }
+                    .expect("Unable to parse character!")
+                })
                 .collect()];
 
             while history[history.len() - 1].iter().any(|x| *x != 0) {
                 let last = &history[history.len() - 1];
 
-                let next: Vec<usize> = last
+                let next: Vec<i32> = last
                     .iter()
                     .enumerate()
                     .filter_map(|(i, _)| match i < last.len() - 1 {
@@ -40,32 +46,30 @@ fn pt1(input: &str) -> usize {
                 history.push(next);
             }
 
-            for (i, seq) in history.iter().enumerate().rev() {
-                let n = history[i].len();
-                let v = history[i][n] + history[i - 1][n];
+            let mut values: Vec<i32> = Vec::new();
+            values.push(0);
 
-                // Cannot edit history as we are iterating over it (this way at least)
-                history[i].push(v);
+            for (i, _) in history.iter().enumerate().rev().skip(1) {
+                let seq = &history[i];
+                let m = seq.len();
+
+                values.push(seq[m - 1] + values[values.len() - 1])
             }
 
-            0
+            values[values.len() - 1]
         })
-        .sum();
-
-    println!("Sequences {:?}", sequences);
-
-    0
+        .sum()
 }
 
-// fn pt2(input: &str) -> usize {
-//     0
-// }
+fn pt2(input: &str) -> usize {
+    0
+}
 
 pub fn day09() {
     let input = read_input("./src/day09/puzzle_input.txt");
     println!("Day 8:");
     println!("Part 1: {}", pt1(&input));
-    // println!("Part 2: {}", pt2(&input));
+    println!("Part 2: {}", pt2(&input));
     println!("-------------------------------------------------------")
 }
 
@@ -88,11 +92,14 @@ mod tests {
         assert_eq!(pt1(puzzle_input), 114);
     }
 
-    //     #[test]
-    //     fn test_pt2() {
-    //         let puzzle_input = "\
-    // ";
-    //
-    //         assert_eq!(pt2(puzzle_input), 6);
-    //     }
+    #[test]
+    fn test_pt2() {
+        let puzzle_input = "\
+0 3 6 9 12 15
+1 3 6 10 15 21
+10 13 16 21 30 45\
+";
+
+        assert_eq!(pt2(puzzle_input), 2);
+    }
 }
