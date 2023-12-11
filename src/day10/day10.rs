@@ -2,8 +2,6 @@
 // Advent of Code 2023 - Day 10
 // -------------------------------------------------------
 
-use std::collections::HashMap;
-
 use crate::read_input;
 
 // -------------------------------------------------------
@@ -51,69 +49,61 @@ impl Pipe {
 
 struct Diagram {
     pipes: Vec<Vec<Pipe>>,
+    start: (usize, usize),
 }
 
 impl Diagram {
     fn from(input: &str) -> Self {
+        // let mut start: (usize, usize);
+
         let pipes: Vec<Vec<Pipe>> = input
             .lines()
             .map(|line| line.chars().map(|c| Pipe::from(c)).collect())
             .collect();
 
-        let mut grid: HashMap<(usize, usize), Vec<(usize, usize)>> = HashMap::new();
-        for i in 0..pipes.len() {
-            for j in 0..pipes[0].len() {
-                match pipes[i][j] {
-                    Pipe::Start => grid
-                        .insert((i, j), Vec::new())
-                        .expect("Failed to insert vector into grid!"),
-                    Pipe::Vertical => {
-                        grid.insert((i, j), Vec::new())
-                            .expect("Failed to insert vector into grid!");
-                        grid[&(i, j)].push((i, j + 1));
-                        grid[&(i, j)].push((i, j - 1));
-                    }
-                    Pipe::Horizontal => {
-                        grid.insert((i, j), Vec::new())
-                            .expect("Failed to insert vector into grid!");
-                        grid[&(i, j)].push((i + 1, j));
-                        grid[&(i, j)].push((i - 1, j));
-                    }
-                    Pipe::NorthEast => {
-                        grid.insert((i, j), Vec::new())
-                            .expect("Failed to insert vector into grid!");
-                        grid[&(i, j)].push((i, j + 1));
-                        grid[&(i, j)].push((i + 1, j));
-                    }
-                    Pipe::NorthWest => {
-                        grid.insert((i, j), Vec::new())
-                            .expect("Failed to insert vector into grid!");
-                        grid[&(i, j)].push((i, j + 1));
-                        grid[&(i, j)].push((i - 1, j));
-                    }
-                    Pipe::SouthEast => {
-                        grid.insert((i, j), Vec::new())
-                            .expect("Failed to insert vector into grid!");
-                        grid[&(i, j)].push((i, j - 1));
-                        grid[&(i, j)].push((i + 1, j));
-                    }
-                    Pipe::SouthWest => {
-                        grid.insert((i, j), Vec::new())
-                            .expect("Failed to insert vector into grid!");
-                        grid[&(i, j)].push((i, j - 1));
-                        grid[&(i, j)].push((i - 1, j));
-                    }
-                    Pipe::Nil => grid.insert((i, j), Vec::new()),
-                };
-            }
-        }
-
-        println!("Grid: {:?}", grid);
-
         println!("Pipes: {:?}", pipes);
 
-        Self { pipes: Vec::new() }
+        let start: (usize, usize) = input
+            .lines()
+            .enumerate()
+            .filter_map(|(i, row)| {
+                let m: Vec<(usize, usize)> = row
+                    .chars()
+                    .enumerate()
+                    .filter_map(|(j, c)| match c == 'S' {
+                        true => Some((i, j)),
+                        false => None,
+                    })
+                    .collect();
+
+                match m.len() > 0 {
+                    true => Some(m[0]),
+                    false => None,
+                }
+            })
+            .collect::<Vec<(usize, usize)>>()[0];
+
+        println!("Start: {:?}", start);
+
+        Self {
+            pipes,
+            start: (0, 0),
+        }
     }
+}
+
+// -------------------------------------------------------
+// Helper Functions
+// -------------------------------------------------------
+
+// fn adjacent_coords(coords: (usize, usize), dims: (usize, usize)) -> Vec<(usize, usize)> {
+//     let adjacent: Vec<(usize, usize)> = Vec::new();
+//
+//     if i + 1 <
+// }
+
+fn find_loop() -> usize {
+    0
 }
 
 // -------------------------------------------------------
@@ -121,7 +111,8 @@ impl Diagram {
 // -------------------------------------------------------
 
 fn pt1(input: &str) -> usize {
-    let diagram = Diagram::from(input);
+    let mut diagram = Diagram::from(input);
+    let dims = (diagram.pipes.len(), diagram.pipes[0].len());
 
     0
 }
