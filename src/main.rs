@@ -1,6 +1,7 @@
 use aoc2023::{
     day01::day01::day01, day02::day02::day02, day03::day03::day03, day04::day04::day04,
     day05::day05::day05, day06::day06::day06, day07::day07::day07, day08::day08::day08,
+    day09::day09::day09, day10::day10::day10,
 };
 
 use clap::Parser;
@@ -23,6 +24,8 @@ fn main() {
         Some(6) => day06(),
         Some(7) => day07(),
         Some(8) => day08(),
+        Some(9) => day09(),
+        Some(10) => day10(),
         Some(0) => {
             day01();
             day02();
@@ -32,6 +35,8 @@ fn main() {
             day06();
             day07();
             day08();
+            day09();
+            day10();
         }
         _ => (),
     }

@@ -8,18 +8,7 @@ use crate::read_input;
 // Custom Data Structures
 // -------------------------------------------------------
 
-// Consider using a recursive function to traverse the diagram and find a solution
-// - Start at starting pipe ('S')
-// - Let rec be the recursive function that traverses the diagram and finds the result
-// - Let i, j represent the cell in which the starting pipe resides
-// - rec(i, j) = max(rec(i - 1, j), rec(i + 1, j), rec(i, j - 1), rec(i, j + 1))
-// - If a nil value is encountered ('.') then the current path is not part of the loop
-// - When the starting pipe is found again the loop has been closed, return the number of steps
-// taken
-// - I am inclined to say the result should be the total number of steps in the loop divided by 2,
-// which would be halfway around the loop
-
-#[derive(Debug)]
+#[derive(Debug, Clone, Copy)]
 enum Pipe {
     Start,
     Horizontal,
@@ -90,27 +79,111 @@ impl Diagram {
 // Helper Functions
 // -------------------------------------------------------
 
-fn adjacent_coords(coords: (usize, usize), dims: (usize, usize)) -> Vec<(usize, usize)> {
-    let adjacent: Vec<(usize, usize)> = Vec::new();
-    let (m, n) = dims;
+fn adjacent_coords(
+    pipe: Pipe,
+    coords: (usize, usize),
+    dims: (usize, usize),
+    visited: Vec<(usize, usize)>,
+) -> Vec<(usize, usize)> {
+    let mut adjacent: Vec<(usize, usize)> = Vec::new();
 
-    if i + 1 < m {
-        adjacent.push((i + 1, j));
+    let (i, j) = coords; // i = row index, j = col index
+    let (m, n) = dims; // m = num rows, n = num cols
+
+    match pipe {
+        Pipe::Start => {
+            if i + 1 < m {
+                adjacent.push((i + 1, j));
+            }
+
+            if i > 0 {
+                adjacent.push((i - 1, j));
+            }
+
+            if j + 1 < n {
+                adjacent.push((i, j + 1));
+            }
+
+            if j > 0 {
+                adjacent.push((i, j - 1));
+            }
+        }
+        Pipe::Horizontal => {
+            if j + 1 < n {
+                adjacent.push((i, j + 1));
+            }
+            if j > 0 {
+                adjacent.push((i, j - 1));
+            }
+        }
+        Pipe::Vertical => {
+            if i + 1 < m {
+                adjacent.push((i + 1, j));
+            }
+
+            if i > 0 {
+                adjacent.push((i - 1, j));
+            }
+        }
+        Pipe::NorthEast => {
+            if i + 1 < m {
+                adjacent.push((i + 1, j));
+            }
+
+            if j + 1 < n {
+                adjacent.push((i, j + 1));
+            }
+        }
+        Pipe::NorthWest => {
+            if i + 1 < m {
+                adjacent.push((i + 1, j));
+            }
+
+            if j > 0 {
+                adjacent.push((i, j - 1));
+            }
+        }
+        Pipe::SouthEast => {
+            if i > 0 {
+                adjacent.push((i - 1, j));
+            }
+
+            if j + 1 < n {
+                adjacent.push((i, j + 1));
+            }
+        }
+        Pipe::SouthWest => {
+            if i > 0 {
+                adjacent.push((i - 1, j));
+            }
+
+            if j > 0 {
+                adjacent.push((i, j - 1));
+            }
+        }
+        Pipe::Nil => {}
     }
 
-    if i > 0 {
-        adjacent.push((i - 1, j));
-    }
-
-    if j + 1 < m {
-        adjacent.push((i, j + 1));
-    }
-    if j > 0 {
-        adjacent.push((i, j - 1));
-    }
+    adjacent
+        .iter()
+        .filter_map(|adj| match !visited.contains(adj) {
+            true => Some(*adj),
+            false => None,
+        })
+        .collect::<Vec<(usize, usize)>>()
 }
 
-fn find_loop(coords: (usize, usize), dims: (usize, usize)) -> usize {
+fn find_loop(
+    pipes: &Vec<Vec<Pipe>>,
+    coords: (usize, usize),
+    dims: (usize, usize),
+    visited: Vec<(usize, usize)>,
+) -> usize {
+    let pipe = pipes[coords.0][coords.1];
+    let adjacent = adjacent_coords(pipe, coords, dims, visited.to_vec());
+
+    println!("Adjacent: {:?}", adjacent);
+
     0
 }
 
@@ -119,11 +192,17 @@ fn find_loop(coords: (usize, usize), dims: (usize, usize)) -> usize {
 // -------------------------------------------------------
 
 fn pt1(input: &str) -> usize {
-    let mut diagram = Diagram::from(input);
+    let diagram = Diagram::from(input);
 
-    let loop_length = find_loop(diagram.start, diagram.dims);
+    let mut coords = diagram.start;
+    let dims = diagram.dims;
+    let mut visited: Vec<(usize, usize)> = Vec::new();
 
-    println!("Loop length: {:?}", loop_length);
+    find_loop(&diagram.pipes, coords, dims, visited);
+
+    loop {
+        break;
+    }
 
     0
 }
