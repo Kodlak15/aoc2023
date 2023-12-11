@@ -50,18 +50,15 @@ impl Pipe {
 struct Diagram {
     pipes: Vec<Vec<Pipe>>,
     start: (usize, usize),
+    dims: (usize, usize),
 }
 
 impl Diagram {
     fn from(input: &str) -> Self {
-        // let mut start: (usize, usize);
-
         let pipes: Vec<Vec<Pipe>> = input
             .lines()
             .map(|line| line.chars().map(|c| Pipe::from(c)).collect())
             .collect();
-
-        println!("Pipes: {:?}", pipes);
 
         let start: (usize, usize) = input
             .lines()
@@ -83,12 +80,9 @@ impl Diagram {
             })
             .collect::<Vec<(usize, usize)>>()[0];
 
-        println!("Start: {:?}", start);
+        let dims = (pipes.len(), pipes[1].len());
 
-        Self {
-            pipes,
-            start: (0, 0),
-        }
+        Self { pipes, start, dims }
     }
 }
 
@@ -96,13 +90,27 @@ impl Diagram {
 // Helper Functions
 // -------------------------------------------------------
 
-// fn adjacent_coords(coords: (usize, usize), dims: (usize, usize)) -> Vec<(usize, usize)> {
-//     let adjacent: Vec<(usize, usize)> = Vec::new();
-//
-//     if i + 1 <
-// }
+fn adjacent_coords(coords: (usize, usize), dims: (usize, usize)) -> Vec<(usize, usize)> {
+    let adjacent: Vec<(usize, usize)> = Vec::new();
+    let (m, n) = dims;
 
-fn find_loop() -> usize {
+    if i + 1 < m {
+        adjacent.push((i + 1, j));
+    }
+
+    if i > 0 {
+        adjacent.push((i - 1, j));
+    }
+
+    if j + 1 < m {
+        adjacent.push((i, j + 1));
+    }
+    if j > 0 {
+        adjacent.push((i, j - 1));
+    }
+}
+
+fn find_loop(coords: (usize, usize), dims: (usize, usize)) -> usize {
     0
 }
 
@@ -112,7 +120,10 @@ fn find_loop() -> usize {
 
 fn pt1(input: &str) -> usize {
     let mut diagram = Diagram::from(input);
-    let dims = (diagram.pipes.len(), diagram.pipes[0].len());
+
+    let loop_length = find_loop(diagram.start, diagram.dims);
+
+    println!("Loop length: {:?}", loop_length);
 
     0
 }
