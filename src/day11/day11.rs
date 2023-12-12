@@ -11,97 +11,53 @@ use crate::read_input;
 #[derive(Debug, Clone)]
 struct Universe {
     image: Vec<Vec<char>>,
+    empty_rows: Vec<usize>,
+    empty_cols: Vec<usize>,
 }
 
 impl Universe {
-    fn from(input: &str, expansion_factor: u32) -> Self {
-        let mut image: Vec<Vec<char>> = input
+    fn from(input: &str) -> Self {
+        let image: Vec<Vec<char>> = input
             .lines()
             .map(|line| line.chars().collect::<Vec<char>>())
             .collect();
 
-        image = expand(&mut image, expansion_factor);
-        println!("Image expanded...");
-        // image = transpose(&mut image);
-        // println!("Image transposed...");
-        // image = expand(&mut image, expansion_factor);
-        // println!("Image expanded...");
-        // image = transpose(&mut image);
-        // println!("Image transposed...");
+        let mut row_not_empty: Vec<usize> = Vec::new();
+        let mut col_not_empty: Vec<usize> = Vec::new();
 
-        println!("Expanded image rows: {:?}", image.len());
-        println!("Expanded image cols: {:?}", image[0].len());
+        for i in 0..image.len() {
+            for j in 0..image[0].len() {
+                if image[i][j] == '#' {
+                    if !row_not_empty.contains(&i) {
+                        row_not_empty.push(i);
+                    }
 
-        Self { image }
+                    if !col_not_empty.contains(&j) {
+                        col_not_empty.push(j);
+                    }
+                }
+            }
+        }
+
+        let empty_rows: Vec<usize> = (0..image.len())
+            .filter(|i| !row_not_empty.contains(&i))
+            .collect();
+
+        let empty_cols: Vec<usize> = (0..image[0].len())
+            .filter(|j| !col_not_empty.contains(&j))
+            .collect();
+
+        Self {
+            image,
+            empty_rows,
+            empty_cols,
+        }
     }
 }
 
 // -------------------------------------------------------
 // Helper Functions
 // -------------------------------------------------------
-
-// The issue seems to be that I cannot hold the array from part 2 in memory at all, so I need to
-// find a more clever way of determining where the empty space lies
-
-fn expand(image: &mut Vec<Vec<char>>, factor: u32) -> Vec<Vec<char>> {
-    let mut expanded_image: Vec<Vec<char>> = Vec::new();
-
-    let mut row_not_empty: Vec<usize> = Vec::new();
-    let mut col_not_empty: Vec<usize> = Vec::new();
-
-    for i in 0..image.len() {
-        for j in 0..image[0].len() {
-            if image[i][j] == '#' {
-                if !row_not_empty.contains(&i) {
-                    row_not_empty.push(i);
-                }
-
-                if !col_not_empty.contains(&j) {
-                    col_not_empty.push(j);
-                }
-            }
-        }
-    }
-
-    for i in 0..image.len() {
-        let mut row: Vec<char> = Vec::new();
-
-        for j in 0..image[0].len() {
-            if !col_not_empty.contains(&i) {
-                for _ in 0..factor - 1 {
-                    row.push('.')
-                }
-            }
-
-            row.push(image[i][j]);
-        }
-
-        if !row_not_empty.contains(&i) {
-            for _ in 0..factor - 1 {
-                expanded_image.push(row.clone());
-            }
-        }
-
-        expanded_image.push(row);
-    }
-
-    expanded_image
-}
-
-// Out of memory error due to this implementation
-// fn transpose(image: &mut Vec<Vec<char>>) -> Vec<Vec<char>> {
-//     let mut transposed_image: Vec<Vec<char>> = Vec::new();
-//
-//     let nrows = image.len();
-//     let ncols = image[0].len();
-//
-// for i in 0..image[0].len() {
-//     let transposed_row: Vec<char> = image.iter().rev().map(|row| row[i]).collect();
-//     transposed_image.push(transposed_row.clone());
-// }
-//
-//     transposed_image
-// }
 
 fn get_galaxies(image: Vec<Vec<char>>) -> Vec<(usize, usize)> {
     image
@@ -118,11 +74,30 @@ fn get_galaxies(image: Vec<Vec<char>>) -> Vec<(usize, usize)> {
         .collect()
 }
 
-fn distance(g1: (usize, usize), g2: (usize, usize)) -> usize {
-    let (m1, n1) = g1;
-    let (m2, n2) = g2;
+fn distance(
+    g1: (usize, usize),
+    g2: (usize, usize),
+    factor: usize,
+    empty_rows: Vec<usize>,
+    empty_cols: Vec<usize>,
+) -> usize {
+    let (m1, n1) = (g1.0.min(g2.0), g1.1.min(g2.1));
+    let (m2, n2) = (g1.0.max(g2.0), g1.1.max(g2.1));
 
-    (m1.max(m2) - m1.min(m2)) + (n1.max(n2) - n1.min(n2))
+    let er = (m1..m2)
+        .filter(|i| empty_rows.contains(&i))
+        .collect::<Vec<usize>>()
+        .len();
+
+    let ec = (n1..n2)
+        .filter(|j| empty_cols.contains(&j))
+        .collect::<Vec<usize>>()
+        .len();
+
+    let nr = (m2 - m1) - er;
+    let nc = (n2 - n1) - ec;
+
+    nr + nc + (factor * (er + ec))
 }
 
 // -------------------------------------------------------
@@ -130,8 +105,9 @@ fn distance(g1: (usize, usize), g2: (usize, usize)) -> usize {
 // -------------------------------------------------------
 
 fn pt1(input: &str) -> usize {
-    let universe = Universe::from(input, 2);
+    let universe = Universe::from(input);
     let galaxies = get_galaxies(universe.image);
+    let factor = 2;
 
     galaxies
         .iter()
@@ -141,15 +117,24 @@ fn pt1(input: &str) -> usize {
                 .iter()
                 .enumerate()
                 .filter(move |(j, _)| j > &i)
-                .map(|(_, g2)| distance(*g1, *g2))
+                .map(|(_, g2)| {
+                    distance(
+                        *g1,
+                        *g2,
+                        factor,
+                        universe.empty_rows.clone(),
+                        universe.empty_cols.clone(),
+                    )
+                })
                 .collect::<Vec<usize>>()
         })
         .sum()
 }
 
 fn pt2(input: &str) -> usize {
-    let universe = Universe::from(input, 1000000);
+    let universe = Universe::from(input);
     let galaxies = get_galaxies(universe.image);
+    let factor = 1000000;
 
     galaxies
         .iter()
@@ -159,7 +144,15 @@ fn pt2(input: &str) -> usize {
                 .iter()
                 .enumerate()
                 .filter(move |(j, _)| j > &i)
-                .map(|(_, g2)| distance(*g1, *g2))
+                .map(|(_, g2)| {
+                    distance(
+                        *g1,
+                        *g2,
+                        factor,
+                        universe.empty_rows.clone(),
+                        universe.empty_cols.clone(),
+                    )
+                })
                 .collect::<Vec<usize>>()
         })
         .sum()
@@ -198,12 +191,4 @@ mod tests {
 
         assert_eq!(pt1(puzzle_input), 374);
     }
-
-    //     #[test]
-    //     fn test_pt2() {
-    //         let puzzle_input = "\
-    // ";
-    //
-    //         assert_eq!(pt2(puzzle_input), 6);
-    //     }
 }
