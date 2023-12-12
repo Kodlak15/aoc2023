@@ -84,11 +84,13 @@ fn distance(
     let (m1, n1) = (g1.0.min(g2.0), g1.1.min(g2.1));
     let (m2, n2) = (g1.0.max(g2.0), g1.1.max(g2.1));
 
+    // Empty rows between g1 and g2
     let er = (m1..m2)
         .filter(|i| empty_rows.contains(&i))
         .collect::<Vec<usize>>()
         .len();
 
+    // Empty cols between g1 and g2
     let ec = (n1..n2)
         .filter(|j| empty_cols.contains(&j))
         .collect::<Vec<usize>>()
