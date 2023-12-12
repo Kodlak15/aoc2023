@@ -43,7 +43,7 @@ impl Universe {
 // -------------------------------------------------------
 
 fn expand(image: &mut Vec<VecDeque<char>>, factor: u32) -> Vec<VecDeque<char>> {
-    let mut expanded_image: Vec<VecDeque<char>> = vec![vec![0; image.len()], image[0].len()];
+    let mut expanded_image: Vec<VecDeque<char>> = Vec::new();
 
     while !image.is_empty() {
         let row = image.pop().expect("Could not unpack image row!");
@@ -64,9 +64,29 @@ fn expand(image: &mut Vec<VecDeque<char>>, factor: u32) -> Vec<VecDeque<char>> {
 fn transpose(image: &mut Vec<VecDeque<char>>) -> Vec<VecDeque<char>> {
     let mut transposed_image: Vec<VecDeque<char>> = Vec::new();
 
-    // for i in 0..image[0].len() {
-    //     let transposed_row: VecDeque<char> = image.iter().rev().map(|row| row[i]).collect();
-    //     transposed_image.push(transposed_row.clone());
+    let ncols = image[0].len();
+    transposed_image.resize_with(ncols, VecDeque::new);
+
+    for row in image.drain(..) {
+        assert_eq!(ncols, row.len());
+
+        for (i, c) in row.into_iter().enumerate() {
+            transposed_image[i].push_front(c);
+            transposed_image[i].shrink_to_fit();
+        }
+    }
+
+    // for _ in 0..image[0].len() {
+    //     let v: VecDeque<char> = VecDeque::new();
+    //     transposed_image.push(v);
+    // }
+    //
+    // while !image.is_empty() {
+    //     let row = image.pop().expect("Could not pop row from image");
+    //
+    //     for i in 0..row.len() {
+    //         transposed_image[i].push_front(row[i]);
+    //     }
     // }
 
     transposed_image
