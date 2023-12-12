@@ -8,7 +8,6 @@ use crate::read_input;
 // Custom Data Structures
 // -------------------------------------------------------
 
-#[derive(Debug, Clone)]
 struct Universe {
     image: Vec<Vec<char>>,
     empty_rows: Vec<usize>,
