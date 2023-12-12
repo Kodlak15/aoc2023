@@ -22,12 +22,12 @@ impl Universe {
 
         image = expand(&mut image, expansion_factor);
         println!("Image expanded...");
-        image = transpose(&mut image);
-        println!("Image transposed...");
-        image = expand(&mut image, expansion_factor);
-        println!("Image expanded...");
-        image = transpose(&mut image);
-        println!("Image transposed...");
+        // image = transpose(&mut image);
+        // println!("Image transposed...");
+        // image = expand(&mut image, expansion_factor);
+        // println!("Image expanded...");
+        // image = transpose(&mut image);
+        // println!("Image transposed...");
 
         println!("Expanded image rows: {:?}", image.len());
         println!("Expanded image cols: {:?}", image[0].len());
@@ -40,13 +40,43 @@ impl Universe {
 // Helper Functions
 // -------------------------------------------------------
 
+// The issue seems to be that I cannot hold the array from part 2 in memory at all, so I need to
+// find a more clever way of determining where the empty space lies
+
 fn expand(image: &mut Vec<Vec<char>>, factor: u32) -> Vec<Vec<char>> {
     let mut expanded_image: Vec<Vec<char>> = Vec::new();
 
-    while !image.is_empty() {
-        let row = image.pop().expect("Could not unpack image row!");
+    let mut row_not_empty: Vec<usize> = Vec::new();
+    let mut col_not_empty: Vec<usize> = Vec::new();
 
-        if row.iter().all(|c| *c == '.') {
+    for i in 0..image.len() {
+        for j in 0..image[0].len() {
+            if image[i][j] == '#' {
+                if !row_not_empty.contains(&i) {
+                    row_not_empty.push(i);
+                }
+
+                if !col_not_empty.contains(&j) {
+                    col_not_empty.push(j);
+                }
+            }
+        }
+    }
+
+    for i in 0..image.len() {
+        let mut row: Vec<char> = Vec::new();
+
+        for j in 0..image[0].len() {
+            if !col_not_empty.contains(&i) {
+                for _ in 0..factor - 1 {
+                    row.push('.')
+                }
+            }
+
+            row.push(image[i][j]);
+        }
+
+        if !row_not_empty.contains(&i) {
             for _ in 0..factor - 1 {
                 expanded_image.push(row.clone());
             }
@@ -58,24 +88,20 @@ fn expand(image: &mut Vec<Vec<char>>, factor: u32) -> Vec<Vec<char>> {
     expanded_image
 }
 
-// Steps:
-// - Get and remove first row from image
-// - Make that row first col of new image
-
 // Out of memory error due to this implementation
-fn transpose(image: &mut Vec<Vec<char>>) -> Vec<Vec<char>> {
-    let mut transposed_image: Vec<Vec<char>> = Vec::new();
-
-    let nrows = image.len();
-    let ncols = image[0].len();
-
-    // for i in 0..image[0].len() {
-    //     let transposed_row: Vec<char> = image.iter().rev().map(|row| row[i]).collect();
-    //     transposed_image.push(transposed_row.clone());
-    // }
-
-    transposed_image
-}
+// fn transpose(image: &mut Vec<Vec<char>>) -> Vec<Vec<char>> {
+//     let mut transposed_image: Vec<Vec<char>> = Vec::new();
+//
+//     let nrows = image.len();
+//     let ncols = image[0].len();
+//
+// for i in 0..image[0].len() {
+//     let transposed_row: Vec<char> = image.iter().rev().map(|row| row[i]).collect();
+//     transposed_image.push(transposed_row.clone());
+// }
+//
+//     transposed_image
+// }
 
 fn get_galaxies(image: Vec<Vec<char>>) -> Vec<(usize, usize)> {
     image
