@@ -40,6 +40,7 @@ Example: ?###???????? 3,2,1
 - from left to right, start by determining the range of possibilities for each group
 - once the range of possibilities is established, find all possible combinations
 
+     0 1 2 3 4 5 6 7 8 9 t e
 t1:  ? # # # ? ? ? ? ? ? ? ? (not possible)
 g1: [     ]
 g2:         [   ]
@@ -48,6 +49,7 @@ g3:               [ ]
 - shift groups 1, 2, and 3 to the right by 1
 - here we find 3 consecutive known broken coils, so we know t1 is impossible
 
+     0 1 2 3 4 5 6 7 8 9 t e
 t2:  ? # # # ? ? ? ? ? ? ? ?
 g1:   [     ]
 g2:           [   ]
@@ -55,6 +57,7 @@ g3:                 [ ]
 
 - shift groups 2, and 3 to the right by 1
 
+     0 1 2 3 4 5 6 7 8 9 t e
 t3:  ? # # # ? ? ? ? ? ? ? ?
 g1:   [     ]
 g2:             [   ]
@@ -62,6 +65,7 @@ g3:                   [ ]
 
 - shift groups 2, and 3 to the right by 1
 
+     0 1 2 3 4 5 6 7 8 9 t e
 t4:  ? # # # ? ? ? ? ? ? ? ?
 g1:   [     ]
 g2:               [   ]
@@ -70,7 +74,8 @@ g3:                     [ ]
 - shift groups 2, and 3 to the right by 1
 - here we have established the range of possibilities for all groups
 
-t4:  ? # # # ? ? ? ? ? ? ? ?
+     0 1 2 3 4 5 6 7 8 9 t e
+t5:  ? # # # ? ? ? ? ? ? ? ?
 g1:   [     ]
 g2:                 [   ]
 g3:                       [ ]
@@ -78,39 +83,49 @@ g3:                       [ ]
 - move group 2 back to the start of its range and iterate over all possibilities for group 3 
 
 
-t5:  ? # # # ? ? ? ? ? ? ? ?
+     0 1 2 3 4 5 6 7 8 9 t e
+t6:  ? # # # ? ? ? ? ? ? ? ?
+g1:   [     ]
+g2:           [   ]
+g3:                 [ ]
+
+     0 1 2 3 4 5 6 7 8 9 t e
+t7:  ? # # # ? ? ? ? ? ? ? ?
 g1:   [     ]
 g2:           [   ]
 g3:                   [ ]
 
-t5:  ? # # # ? ? ? ? ? ? ? ?
+     0 1 2 3 4 5 6 7 8 9 t e
+t8:  ? # # # ? ? ? ? ? ? ? ?
 g1:   [     ]
 g2:           [   ]
 g3:                     [ ]
 
-t6:  ? # # # ? ? ? ? ? ? ? ?
+     0 1 2 3 4 5 6 7 8 9 t e
+t9:  ? # # # ? ? ? ? ? ? ? ?
 g1:   [     ]
 g2:           [   ]
 g3:                       [ ]
 
 - shift group 2 to the right by 1 and repeat the previous process
+- keep in mind the starting point for group 3 if shifted to the right each time group 2 if shifted to the right
 
-t7:  ? # # # ? ? ? ? ? ? ? ?
+     0 1 2 3 4 5 6 7 8 9 t e
+tt:  ? # # # ? ? ? ? ? ? ? ?
 g1:   [     ]
 g2:             [   ]
 g3:                   [ ]
 
-t8:  ? # # # ? ? ? ? ? ? ? ?
+     0 1 2 3 4 5 6 7 8 9 t e
+te:  ? # # # ? ? ? ? ? ? ? ?
 g1:   [     ]
 g2:             [   ]
 g3:                     [ ]
 
-t9:  ? # # # ? ? ? ? ? ? ? ?
-g1:   [     ]
-g2:             [   ]
-g3:                       [ ]
+...
+...
+...
 
-...
-...
-...
+=> group 1 has one possible arrangement
+=> group 2 has 
 ```
