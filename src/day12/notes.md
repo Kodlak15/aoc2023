@@ -8,108 +8,109 @@ What is the sum of those counts?
 - let n = the number of character groupings in a line containing only '?' or '#'
 - let g = the number of groups in a line (comma separated numbers on right side of line)
 - for every line, g >= n
+- each group of broken coils must all be grouped as a consecutive sequence of broken coils
+    - correct grouping:   ..###
+    - incorrect grouping: .#.##
 
-### g = n
+# g = n
 - each of the n character groupings corresponds directly to the size at that same index
 ```
 Example: .??..??...?##. 1,1,3
-=> The first value (1) corresponds to the first ??
-=> The second value (1) corresponds to the second ??
-=> The third value (3) corresponds to ?##
 
-In the first group, there is 1 broken spring that can be in one of two positions. Thus, there are 2 possible arrangements in that group. 
+- imaging there are 3 sliding windows of lengths 1, 1, and 3 which each correspond to the three distinct groups
+- the sliding windows are composed of consecutive known broken coils '#' and possibly broken coils '?'
+- determine the number of times each sliding window can be shifted to the right by 1 index
+- this number + 1 represents the number of possible arrangements for each distinct group
+- the total number of possible arrangements is the product the possible arrangements for each distinct group
+- in the event a distinct group contains known broken coils equal to the length of the window, there is only one possible arrangement
 
-The same logic applies to the second group. 
-
-In the third group, there are 3 broken springs, two of which are already known. Thus, there is only 1 possible arrangement in that group. 
-
-To get the total number of possible arrangements, multiply the possible arrangements for each group together to get 2 * 2 * 1 = 4.
-
-Example Group: #???? 3
-- b = 3 broken springs
-- k = 1 known location
-- u = (b - k) = 2 unknown locations
-- t = 5 possible positions
-- a = (t - k) = 4 available positions
-
-The goal is to find the number of ways we can arrange 2 broken springs in 4 possible positions.
-
-arrangements = a! / (a - u)! = 4! / 2! = 4 * 3 = 12 
+=> group 1 can be shifted right once, so there are 1 + 1 = 2 possible arrangements
+=> group 2 can be shifted right once, so there are 1 + 1 = 2 possible arrangements
+=> group 3 cannot be shifted to the right, so there are 0 + 1 = 1 possible arrangements
+=> total = 2 * 2 * 1 = 4 possible arrangements
 ```
 
-### g > n
+# g > n
 - If the number of groups exceeds the number of character groupings, that means there are sub-groups that need to be found
+- If possible regions overlap (groups 2 and 3 here), then the position of the rightmost broken coil in the group on the left can shrink the region of possibilities of the group on the right
 ```
 Example: ?###???????? 3,2,1
 
-=> The first value (3) has to occupy to the substring ?###?
-    - The '?' on each side are included as groupings of broken springs must be separated by non-broken ones
-=> The second value (2) and the third value (1) must combine to occupy the remaining ???????
-=> May help to use a sliding window type of approach to determine the possible positions each group can occupy
+- use sliding windows to find all group combinations, and determine which are possible
+- from left to right, start by determining the range of possibilities for each group
+- once the range of possibilities is established, find all possible combinations
 
-Indices:      0 1 2 3 4 5 6 7 8 9 t e
------------>  ? # # # ? ? ? ? ? ? ? ?
-Group 1 (3): [? # # # ?]
-Group 2 (2):           [? ? ? ? ?]
-Group 3 (1):                 [? ? ? ?]
+t1:  ? # # # ? ? ? ? ? ? ? ? (not possible)
+g1: [     ]
+g2:         [   ]
+g3:               [ ]
 
-Group 1 is relatively easy, as there are 3 broken coils occupying 3 known locations within indices 0-4, thus there is only 1 possible way to arrange this group.
+- shift groups 1, 2, and 3 to the right by 1
+- here we find 3 consecutive known broken coils, so we know t1 is impossible
 
-Group 2 is also fairly straightforward, as there are 2 broken coils that can occupy any of 5 unknown locations, thus there are 5! / (5 - 2)! = 5 * 4 = 20 possible arrangements.
+t2:  ? # # # ? ? ? ? ? ? ? ?
+g1:   [     ]
+g2:           [   ]
+g3:                 [ ]
 
-Group 3 is trickier, as its region of possible positions is overlaps with those for group 2, and because it is to the right it can be restricted by group 2 (the rightmost broken coil in particular).
+- shift groups 2, and 3 to the right by 1
 
-Some possibilities:
+t3:  ? # # # ? ? ? ? ? ? ? ?
+g1:   [     ]
+g2:             [   ]
+g3:                   [ ]
 
-1) 
-Indices:      0 1 2 3 4 5 6 7 8 9 t e
------------>  ? # # # ? ? ? ? ? ? ? ?
-Group 1 (3): [? # # # ?]
-Group 2 (2):           [# # ? ? ?]
-Group 3 (1):                 [? ? ? ?]
+- shift groups 2, and 3 to the right by 1
 
-=> arrangements = 4! / (4 - 1!) = 4
+t4:  ? # # # ? ? ? ? ? ? ? ?
+g1:   [     ]
+g2:               [   ]
+g3:                     [ ]
 
-2) 
-Indices:      0 1 2 3 4 5 6 7 8 9 t e
------------>  ? # # # ? ? ? ? ? ? ? ?
-Group 1 (3): [? # # # ?]
-Group 2 (2):           [# ? # ? ?]
-Group 3 (1):                   [? ? ?]
+- shift groups 2, and 3 to the right by 1
+- here we have established the range of possibilities for all groups
 
-=> arrangements = 3! / (3 - 1)! = 3
+t4:  ? # # # ? ? ? ? ? ? ? ?
+g1:   [     ]
+g2:                 [   ]
+g3:                       [ ]
 
-3) 
-Indices:      0 1 2 3 4 5 6 7 8 9 t e
------------>  ? # # # ? ? ? ? ? ? ? ?
-Group 1 (3): [? # # # ?]
-Group 2 (2):           [# ? ? # ?]
-Group 3 (1):                     [? ?]
+- move group 2 back to the start of its range and iterate over all possibilities for group 3 
 
-=> arrangements = 2! / (2 - 1)! = 2
 
-4) 
-Indices:      0 1 2 3 4 5 6 7 8 9 t e
------------>  ? # # # ? ? ? ? ? ? ? ?
-Group 1 (3): [? # # # ?]
-Group 2 (2):           [# ? ? ? #]
-Group 3 (1):                       [?]
+t5:  ? # # # ? ? ? ? ? ? ? ?
+g1:   [     ]
+g2:           [   ]
+g3:                   [ ]
 
-=> arrangements = 1! / (1 - 1)! = 1
+t5:  ? # # # ? ? ? ? ? ? ? ?
+g1:   [     ]
+g2:           [   ]
+g3:                     [ ]
 
-- If regions overlap, regions to the left can restrict regions to the right. 
-- If the rightmost broken coil in group 2 is 2 or more indices to the left of group 3, group 3's region of possible locations is unchanged.
-- If the rightmost broken coil in group two is one or fewer indices to the left of group 3, shrink group 3's region on the left such that it is separated from the rightmost broken coil in group 2 by at least 2 indices.
+t6:  ? # # # ? ? ? ? ? ? ? ?
+g1:   [     ]
+g2:           [   ]
+g3:                       [ ]
 
-Rough formula:
-- Let R = the rightmost index of the sub-group to the left
-- Let L = the leftmost index of the sub-group to the right 
-- let N = the max possible length of the sub-group to the right
+- shift group 2 to the right by 1 and repeat the previous process
 
-def arrangements(R, L, N):
-    if L - R < 2:
-        N = N - (R + 2 - L)
-        L = R + 2
+t7:  ? # # # ? ? ? ? ? ? ? ?
+g1:   [     ]
+g2:             [   ]
+g3:                   [ ]
 
-    
+t8:  ? # # # ? ? ? ? ? ? ? ?
+g1:   [     ]
+g2:             [   ]
+g3:                     [ ]
+
+t9:  ? # # # ? ? ? ? ? ? ? ?
+g1:   [     ]
+g2:             [   ]
+g3:                       [ ]
+
+...
+...
+...
 ```
