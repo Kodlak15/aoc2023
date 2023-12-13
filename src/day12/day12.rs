@@ -42,8 +42,8 @@ impl Records {
             );
         }
 
-        println!("Groups: {:?}", groups);
-        println!("Sizes: {:?}", sizes);
+        // println!("Groups: {:?}", groups);
+        // println!("Sizes: {:?}", sizes);
 
         Self { groups, sizes }
     }
@@ -57,10 +57,19 @@ fn sliding_window(group: String, size: usize) -> usize {
     let n = group.len();
     let mut i = 0;
     let mut j = size;
-    let mut arrangements = 0;
+
+    if j == n && group.chars().all(|c| c == '#') {
+        // println!("Group: {:?}", group);
+        // println!("Arrangements: {:?}", 1);
+        return 1;
+    }
+
+    let mut arrangements = 1;
 
     while j < n {
         if group[i..j].chars().all(|c| c == '#') {
+            // println!("Group: {:?}", group);
+            // println!("Arrangements: {:?}", arrangements);
             return 1;
         }
 
@@ -68,6 +77,9 @@ fn sliding_window(group: String, size: usize) -> usize {
         j += 1;
         arrangements += 1;
     }
+
+    // println!("Group: {:?}", group);
+    // println!("Arrangements: {:?}", arrangements);
 
     arrangements
 }
@@ -79,18 +91,28 @@ fn sliding_window(group: String, size: usize) -> usize {
 fn pt1(input: &str) -> usize {
     let records = Records::from(input);
 
-    let _ = records
+    records
         .groups
         .iter()
         .zip(records.sizes.iter())
         .map(|(groups, sizes)| match groups.len() == sizes.len() {
-            true => (0..groups.len())
-                .map(|i| sliding_window(groups[i].clone(), sizes[i]))
-                .sum(),
-            false => 0,
-        });
+            true => {
+                let arrangements = (0..groups.len())
+                    .map(|i| sliding_window(groups[i].clone(), sizes[i]))
+                    .product();
 
-    0
+                println!("Groups: {:?}", groups);
+                println!("Sizes: {:?}", sizes);
+                println!("Arrangements: {:?}", arrangements);
+                println!("------------------------------");
+
+                arrangements
+            }
+            false => 0,
+        })
+        .sum()
+
+    // 0
 }
 
 fn pt2(_input: &str) -> usize {
