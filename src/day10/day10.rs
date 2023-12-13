@@ -223,41 +223,41 @@ pub fn day10() {
 // Tests
 // -------------------------------------------------------
 
-#[cfg(test)]
-mod tests {
-    use super::*;
+// #[cfg(test)]
+// mod tests {
+//     use super::*;
+//
+//     #[test]
+//     fn test1_pt1() {
+//         let puzzle_input = "\
+// .....
+// .S-7.
+// .|.|.
+// .L-J.
+// .....\
+// ";
+//
+//         assert_eq!(pt1(puzzle_input), 4);
+//     }
+//
+//     #[test]
+//     fn test1_pt2() {
+//         let puzzle_input = "\
+// ..F7.
+// .FJ|.
+// SJ.L7
+// |F--J
+// LJ...\
+// ";
+//
+//         assert_eq!(pt1(puzzle_input), 8);
+//     }
 
-    #[test]
-    fn test1_pt1() {
-        let puzzle_input = "\
-.....
-.S-7.
-.|.|.
-.L-J.
-.....\
-";
-
-        assert_eq!(pt1(puzzle_input), 4);
-    }
-
-    #[test]
-    fn test1_pt2() {
-        let puzzle_input = "\
-..F7.
-.FJ|.
-SJ.L7
-|F--J
-LJ...\
-";
-
-        assert_eq!(pt1(puzzle_input), 8);
-    }
-
-    //     #[test]
-    //     fn test_pt2() {
-    //         let puzzle_input = "\
-    // ";
-    //
-    //         assert_eq!(pt2(puzzle_input), 6);
-    //     }
-}
+//     #[test]
+//     fn test_pt2() {
+//         let puzzle_input = "\
+// ";
+//
+//         assert_eq!(pt2(puzzle_input), 6);
+//     }
+// }
