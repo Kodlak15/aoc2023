@@ -100,4 +100,16 @@ Group 3 (1):                       [?]
 - If regions overlap, regions to the left can restrict regions to the right. 
 - If the rightmost broken coil in group 2 is 2 or more indices to the left of group 3, group 3's region of possible locations is unchanged.
 - If the rightmost broken coil in group two is one or fewer indices to the left of group 3, shrink group 3's region on the left such that it is separated from the rightmost broken coil in group 2 by at least 2 indices.
+
+Rough formula:
+- Let R = the rightmost index of the sub-group to the left
+- Let L = the leftmost index of the sub-group to the right 
+- let N = the max possible length of the sub-group to the right
+
+def arrangements(R, L, N):
+    if L - R < 2:
+        N = N - (R + 2 - L)
+        L = R + 2
+
+    
 ```
