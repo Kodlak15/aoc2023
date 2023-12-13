@@ -2,6 +2,8 @@
 // Advent of Code 2023 - Day 12
 // -------------------------------------------------------
 
+use std::io::Write;
+
 use crate::read_input;
 
 // -------------------------------------------------------
@@ -59,6 +61,12 @@ impl Records {
 
 fn pt1(input: &str) -> usize {
     let records = Records::from(input);
+
+    let _ = records
+        .groups
+        .iter()
+        .zip(records.sizes.iter())
+        .map(|(group, size)| {});
 
     0
 }
