@@ -38,6 +38,7 @@ Example: ?###???????? 3,2,1
 
 - use sliding windows to find all group combinations, and determine which are possible
 - from left to right, start by determining the range of possibilities for each group
+- if a number of consecutive broken coils is found equal to the leftmost (moving) window, stop shifting that window there
 - once the range of possibilities is established, find all possible combinations
 
      0 1 2 3 4 5 6 7 8 9 t e
