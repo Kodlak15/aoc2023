@@ -25,11 +25,17 @@ number of possible arrangements, multiply the possible arrangements for each gro
 Example: #???? 3
 - b = 3 broken springs
 - k = 1 known location
-- u = (b - k) 2 unknown locations
+- u = (b - k) = 2 unknown locations
 - t = 5 possible positions
-- a = (t - k) 4 available positions
+- a = (t - k) = 4 available positions
 
 The goal is to find the number of ways we can arrange 2 broken springs in 4 possible positions.
 
 arrangements = a! / u! = 4! / 2! = 4 * 3 = 12 
+```
+
+### g > n
+- If the number of groups exceeds the number of character groupings, that means there are sub-groups that need to be found
+```
+
 ```
