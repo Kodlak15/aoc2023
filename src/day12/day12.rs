@@ -66,7 +66,8 @@ impl Records {
 // Helper Functions
 // -------------------------------------------------------
 
-fn sliding_window(data: String, sizes: Vec<usize>) -> usize {
+// Note: needs to be generalized to work with any number of sizes
+fn sliding_window(data: Vec<char>, sizes: Vec<usize>) -> usize {
     0
 }
 
@@ -82,7 +83,7 @@ fn pt1(input: &str) -> usize {
         .iter()
         .zip(records.line_sizes.iter())
         .map(|(data, sizes)| {
-            let arrangements = sliding_window(data.to_string(), sizes.to_vec());
+            let arrangements = sliding_window(data.chars().collect::<Vec<char>>(), sizes.to_vec());
 
             arrangements
         })
