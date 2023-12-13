@@ -17,12 +17,15 @@ Example: .??..??...?##. 1,1,3
 => The second value (1) corresponds to the second ??
 => The third value (3) corresponds to ?##
 
-In the first group, there is 1 broken spring that can be in one of two positions. Thus, there are 2 possible
-arrangements in that group. The same logic applies to the second group. In the third group, there are 3 broken
-springs, two of which are already known. Thus, there is only 1 possible arrangement in that group. To get the total
-number of possible arrangements, multiply the possible arrangements for each group together to get 2 * 2 * 1 = 4.
+In the first group, there is 1 broken spring that can be in one of two positions. Thus, there are 2 possible arrangements in that group. 
 
-Example: #???? 3
+The same logic applies to the second group. 
+
+In the third group, there are 3 broken springs, two of which are already known. Thus, there is only 1 possible arrangement in that group. 
+
+To get the total number of possible arrangements, multiply the possible arrangements for each group together to get 2 * 2 * 1 = 4.
+
+Example Group: #???? 3
 - b = 3 broken springs
 - k = 1 known location
 - u = (b - k) = 2 unknown locations
@@ -31,11 +34,70 @@ Example: #???? 3
 
 The goal is to find the number of ways we can arrange 2 broken springs in 4 possible positions.
 
-arrangements = a! / u! = 4! / 2! = 4 * 3 = 12 
+arrangements = a! / (a - u)! = 4! / 2! = 4 * 3 = 12 
 ```
 
 ### g > n
 - If the number of groups exceeds the number of character groupings, that means there are sub-groups that need to be found
 ```
+Example: ?###???????? 3,2,1
 
+=> The first value (3) has to occupy to the substring ?###?
+    - The '?' on each side are included as groupings of broken springs must be separated by non-broken ones
+=> The second value (2) and the third value (1) must combine to occupy the remaining ???????
+=> May help to use a sliding window type of approach to determine the possible positions each group can occupy
+
+Indices:      0 1 2 3 4 5 6 7 8 9 t e
+----------->  ? # # # ? ? ? ? ? ? ? ?
+Group 1 (3): [? # # # ?]
+Group 2 (2):           [? ? ? ? ?]
+Group 3 (1):                 [? ? ? ?]
+
+Group 1 is relatively easy, as there are 3 broken coils occupying 3 known locations within indices 0-4, thus there is only 1 possible way to arrange this group.
+
+Group 2 is also fairly straightforward, as there are 2 broken coils that can occupy any of 5 unknown locations, thus there are 5! / (5 - 2)! = 5 * 4 = 20 possible arrangements.
+
+Group 3 is trickier, as its region of possible positions is overlaps with those for group 2, and because it is to the right it can be restricted by group 2 (the rightmost broken coil in particular).
+
+Some possibilities:
+
+1) 
+Indices:      0 1 2 3 4 5 6 7 8 9 t e
+----------->  ? # # # ? ? ? ? ? ? ? ?
+Group 1 (3): [? # # # ?]
+Group 2 (2):           [# # ? ? ?]
+Group 3 (1):                 [? ? ? ?]
+
+=> arrangements = 4! / (4 - 1!) = 4
+
+2) 
+Indices:      0 1 2 3 4 5 6 7 8 9 t e
+----------->  ? # # # ? ? ? ? ? ? ? ?
+Group 1 (3): [? # # # ?]
+Group 2 (2):           [# ? # ? ?]
+Group 3 (1):                   [? ? ?]
+
+=> arrangements = 3! / (3 - 1)! = 3
+
+3) 
+Indices:      0 1 2 3 4 5 6 7 8 9 t e
+----------->  ? # # # ? ? ? ? ? ? ? ?
+Group 1 (3): [? # # # ?]
+Group 2 (2):           [# ? ? # ?]
+Group 3 (1):                     [? ?]
+
+=> arrangements = 2! / (2 - 1)! = 2
+
+4) 
+Indices:      0 1 2 3 4 5 6 7 8 9 t e
+----------->  ? # # # ? ? ? ? ? ? ? ?
+Group 1 (3): [? # # # ?]
+Group 2 (2):           [# ? ? ? #]
+Group 3 (1):                       [?]
+
+=> arrangements = 1! / (1 - 1)! = 1
+
+- If regions overlap, regions to the left can restrict regions to the right. 
+- If the rightmost broken coil in group 2 is 2 or more indices to the left of group 3, group 3's region of possible locations is unchanged.
+- If the rightmost broken coil in group two is one or fewer indices to the left of group 3, shrink group 3's region on the left such that it is separated from the rightmost broken coil in group 2 by at least 2 indices.
 ```
