@@ -21,8 +21,15 @@ In the first group, there is 1 broken spring that can be in one of two positions
 arrangements in that group. The same logic applies to the second group. In the third group, there are 3 broken
 springs, two of which are already known. Thus, there is only 1 possible arrangement in that group. To get the total
 number of possible arrangements, multiply the possible arrangements for each group together to get 2 * 2 * 1 = 4.
+
+Example: #???? 3
+- b = 3 broken springs
+- k = 1 known location
+- u = (b - k) 2 unknown locations
+- t = 5 possible positions
+- a = (t - k) 4 available positions
+
+The goal is to find the number of ways we can arrange 2 broken springs in 4 possible positions.
+
+arrangements = a! / u! = 4! / 2! = 4 * 3 = 12 
 ```
-
-#????? 3
-
-
