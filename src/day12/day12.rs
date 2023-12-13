@@ -2,8 +2,6 @@
 // Advent of Code 2023 - Day 12
 // -------------------------------------------------------
 
-use std::io::Write;
-
 use crate::read_input;
 
 // -------------------------------------------------------
@@ -55,6 +53,25 @@ impl Records {
 // Helper Functions
 // -------------------------------------------------------
 
+fn sliding_window(group: String, size: usize) -> usize {
+    let n = group.len();
+    let mut i = 0;
+    let mut j = size;
+    let mut arrangements = 0;
+
+    while j < n {
+        if group[i..j].chars().all(|c| c == '#') {
+            return 1;
+        }
+
+        i += 1;
+        j += 1;
+        arrangements += 1;
+    }
+
+    arrangements
+}
+
 // -------------------------------------------------------
 // Main Program Logic
 // -------------------------------------------------------
@@ -66,12 +83,17 @@ fn pt1(input: &str) -> usize {
         .groups
         .iter()
         .zip(records.sizes.iter())
-        .map(|(group, size)| {});
+        .map(|(groups, sizes)| match groups.len() == sizes.len() {
+            true => (0..groups.len())
+                .map(|i| sliding_window(groups[i].clone(), sizes[i]))
+                .sum(),
+            false => 0,
+        });
 
     0
 }
 
-fn pt2(input: &str) -> usize {
+fn pt2(_input: &str) -> usize {
     0
 }
 
