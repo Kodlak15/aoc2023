@@ -9,14 +9,14 @@ use crate::read_input;
 // -------------------------------------------------------
 
 struct Records {
-    groups: Vec<String>,
-    sizes: Vec<String>,
+    groups: Vec<Vec<String>>,
+    sizes: Vec<Vec<usize>>,
 }
 
 impl Records {
     fn from(input: &str) -> Self {
-        let mut groups: Vec<String> = Vec::new();
-        let mut sizes: Vec<String> = Vec::new();
+        let mut groups: Vec<Vec<String>> = Vec::new();
+        let mut sizes: Vec<Vec<usize>> = Vec::new();
 
         let data: Vec<Vec<&str>> = input
             .lines()
@@ -24,9 +24,26 @@ impl Records {
             .collect();
 
         for row in &data {
-            groups.push(row[0].to_string());
-            sizes.push(row[1].to_string());
+            groups.push(
+                row[0]
+                    .split(".")
+                    .filter_map(|s| match !s.is_empty() {
+                        true => Some(s.to_string()),
+                        false => None,
+                    })
+                    .collect::<Vec<String>>(),
+            );
+
+            sizes.push(
+                row[1]
+                    .split(",")
+                    .map(|s| s.parse::<usize>().expect("Could not parse size!"))
+                    .collect(),
+            );
         }
+
+        println!("Groups: {:?}", groups);
+        println!("Sizes: {:?}", sizes);
 
         Self { groups, sizes }
     }
