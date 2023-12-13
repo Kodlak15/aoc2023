@@ -126,6 +126,36 @@ g3:                     [ ]
 ...
 ...
 
-=> group 1 has one possible arrangement
-=> group 2 has 
+- the tree of possibilities looks something like this:
+
+{
+    [1-3]: 
+    {
+        [5-6]: 
+        {
+            [8],
+            [9],
+            [10],
+            [11],
+        },
+        [6-7]: 
+        {
+            [9],
+            [10],
+            [11],
+        },
+        [7-8]: 
+        {
+            [10],
+            [11],
+        },
+        [8-9]: 
+        {
+            [11],
+        },
+    }, 
+}
+
+- the total number of arrangements is equal to the number of total number of leaves on the tree
+- ie: 4 + 3 + 2 + 1 = 10
 ```
