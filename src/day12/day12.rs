@@ -8,6 +8,30 @@ use crate::read_input;
 // Custom Data Structures
 // -------------------------------------------------------
 
+struct Records {
+    groups: Vec<String>,
+    sizes: Vec<String>,
+}
+
+impl Records {
+    fn from(input: &str) -> Self {
+        let mut groups: Vec<String> = Vec::new();
+        let mut sizes: Vec<String> = Vec::new();
+
+        let data: Vec<Vec<&str>> = input
+            .lines()
+            .map(|line| line.split(" ").collect::<Vec<&str>>())
+            .collect();
+
+        for row in &data {
+            groups.push(row[0].to_string());
+            sizes.push(row[1].to_string());
+        }
+
+        Self { groups, sizes }
+    }
+}
+
 // -------------------------------------------------------
 // Helper Functions
 // -------------------------------------------------------
@@ -17,6 +41,8 @@ use crate::read_input;
 // -------------------------------------------------------
 
 fn pt1(input: &str) -> usize {
+    let records = Records::from(input);
+
     0
 }
 
@@ -43,18 +69,14 @@ mod tests {
     #[test]
     fn test1_pt1() {
         let puzzle_input = "\
-...#......
-.......#..
-#.........
-..........
-......#...
-.#........
-.........#
-..........
-.......#..
-#...#.....\
+???.### 1,1,3
+.??..??...?##. 1,1,3
+?#?#?#?#?#?#?#? 1,3,1,6
+????.#...#... 4,1,1
+????.######..#####. 1,6,5
+?###???????? 3,2,1\
 ";
 
-        assert_eq!(pt1(puzzle_input), 374);
+        assert_eq!(pt1(puzzle_input), 21);
     }
 }
