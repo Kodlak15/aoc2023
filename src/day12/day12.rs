@@ -9,14 +9,14 @@ use crate::read_input;
 // -------------------------------------------------------
 
 struct Records {
-    groups: Vec<Vec<String>>,
-    sizes: Vec<Vec<usize>>,
+    line_data: Vec<String>,
+    line_sizes: Vec<Vec<usize>>,
 }
 
 impl Records {
     fn from(input: &str) -> Self {
-        let mut groups: Vec<Vec<String>> = Vec::new();
-        let mut sizes: Vec<Vec<usize>> = Vec::new();
+        let mut line_data: Vec<String> = Vec::new();
+        let mut line_sizes: Vec<Vec<usize>> = Vec::new();
 
         let data: Vec<Vec<&str>> = input
             .lines()
@@ -24,17 +24,8 @@ impl Records {
             .collect();
 
         for row in &data {
-            groups.push(
-                row[0]
-                    .split(".")
-                    .filter_map(|s| match !s.is_empty() {
-                        true => Some(s.to_string()),
-                        false => None,
-                    })
-                    .collect::<Vec<String>>(),
-            );
-
-            sizes.push(
+            line_data.push(row[0].to_string());
+            line_sizes.push(
                 row[1]
                     .split(",")
                     .map(|s| s.parse::<usize>().expect("Could not parse size!"))
@@ -42,10 +33,32 @@ impl Records {
             );
         }
 
+        // for row in &data {
+        //     groups.push(
+        //         row[0]
+        //             .split(".")
+        //             .filter_map(|s| match !s.is_empty() {
+        //                 true => Some(s.to_string()),
+        //                 false => None,
+        //             })
+        //             .collect::<Vec<String>>(),
+        //     );
+        //
+        //     sizes.push(
+        //         row[1]
+        //             .split(",")
+        //             .map(|s| s.parse::<usize>().expect("Could not parse size!"))
+        //             .collect(),
+        //     );
+        // }
+
         // println!("Groups: {:?}", groups);
         // println!("Sizes: {:?}", sizes);
 
-        Self { groups, sizes }
+        Self {
+            line_data,
+            line_sizes,
+        }
     }
 }
 
@@ -53,35 +66,8 @@ impl Records {
 // Helper Functions
 // -------------------------------------------------------
 
-fn sliding_window(group: String, size: usize) -> usize {
-    let n = group.len();
-    let mut i = 0;
-    let mut j = size;
-
-    if j == n && group.chars().all(|c| c == '#') {
-        // println!("Group: {:?}", group);
-        // println!("Arrangements: {:?}", 1);
-        return 1;
-    }
-
-    let mut arrangements = 1;
-
-    while j < n {
-        if group[i..j].chars().all(|c| c == '#') {
-            // println!("Group: {:?}", group);
-            // println!("Arrangements: {:?}", arrangements);
-            return 1;
-        }
-
-        i += 1;
-        j += 1;
-        arrangements += 1;
-    }
-
-    // println!("Group: {:?}", group);
-    // println!("Arrangements: {:?}", arrangements);
-
-    arrangements
+fn sliding_window(group: String, sizes: Vec<usize>) -> usize {
+    0
 }
 
 // -------------------------------------------------------
@@ -91,28 +77,7 @@ fn sliding_window(group: String, size: usize) -> usize {
 fn pt1(input: &str) -> usize {
     let records = Records::from(input);
 
-    records
-        .groups
-        .iter()
-        .zip(records.sizes.iter())
-        .map(|(groups, sizes)| match groups.len() == sizes.len() {
-            true => {
-                let arrangements = (0..groups.len())
-                    .map(|i| sliding_window(groups[i].clone(), sizes[i]))
-                    .product();
-
-                println!("Groups: {:?}", groups);
-                println!("Sizes: {:?}", sizes);
-                println!("Arrangements: {:?}", arrangements);
-                println!("------------------------------");
-
-                arrangements
-            }
-            false => 0,
-        })
-        .sum()
-
-    // 0
+    0
 }
 
 fn pt2(_input: &str) -> usize {
