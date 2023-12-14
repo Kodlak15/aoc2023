@@ -107,12 +107,12 @@ fn pt1(input: &str) -> usize {
         .iter()
         .map(|pattern| {
             let vn = find_reflection(pattern.cols.clone());
-            let hn = 100 * find_reflection(pattern.rows.clone());
+            let hn = find_reflection(pattern.rows.clone());
 
             assert!(vn == 0 || hn == 0);
             assert!(vn != 0 || hn != 0);
 
-            vn + hn
+            vn + (100 * hn)
         })
         .sum()
 }
