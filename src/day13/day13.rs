@@ -76,14 +76,21 @@ fn find_reflection(pattern: Vec<String>) -> usize {
         return 0;
     }
 
-    while i > 0 && j < pattern.len() {
+    let mut i = 1;
+    let mut j = pattern.len() - 1;
+
+    while i < j {
         if pattern[i] != pattern[j] {
             return 0;
         }
 
-        i -= 1;
-        j += 1;
+        i += 1;
+        j -= 1;
     }
+
+    println!("Pattern: {:?}", pattern);
+    println!("Reflection: {:?}", reflection);
+    println!("-------------------------------------------------------");
 
     reflection
 }
