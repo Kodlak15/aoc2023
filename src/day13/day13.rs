@@ -54,37 +54,64 @@ impl Notes {
 // Helper Functions
 // -------------------------------------------------------
 
-fn is_perfect_reflection(pattern: Vec<String>, coords: (usize, usize)) -> bool {
+fn is_perfect_reflection(pattern: Vec<String>, coords: (usize, usize), smudged: bool) -> bool {
     let (mut i, mut j) = (coords.0, coords.1);
 
-    loop {
-        if pattern[i] != pattern[j] {
-            return false;
-        }
+    match smudged {
+        true => {
+            let mut k = 0;
 
-        if i == 0 {
-            break;
+            true
         }
+        false => {
+            loop {
+                if pattern[i] != pattern[j] {
+                    return false;
+                }
 
-        if j == pattern.len() - 1 {
-            break;
+                if i == 0 {
+                    break;
+                }
+
+                if j == pattern.len() - 1 {
+                    break;
+                }
+
+                i -= 1;
+                j += 1;
+            }
+
+            true
         }
-
-        i -= 1;
-        j += 1;
     }
-
-    true
 }
 
-fn find_reflection(pattern: Vec<String>) -> usize {
+fn find_reflection(pattern: Vec<String>, smudged: bool) -> usize {
     let mut i = 0;
     let mut j = 1;
 
     while j < pattern.len() {
-        if pattern[i] == pattern[j] {
-            if is_perfect_reflection(pattern.clone(), (i, j)) {
-                return j;
+        match smudged {
+            true => {
+                let ne = pattern[i]
+                    .chars()
+                    .zip(pattern[j].chars())
+                    .filter(|(c1, c2)| c1 != c2)
+                    .collect::<Vec<(char, char)>>()
+                    .len();
+
+                if ne < 2 {
+                    if is_perfect_reflection(pattern.clone(), (i, j), true) {
+                        return j;
+                    }
+                }
+            }
+            false => {
+                if pattern[i] == pattern[j] {
+                    if is_perfect_reflection(pattern.clone(), (i, j), false) {
+                        return j;
+                    }
+                }
             }
         }
 
@@ -106,8 +133,8 @@ fn pt1(input: &str) -> usize {
         .patterns
         .iter()
         .map(|pattern| {
-            let vn = find_reflection(pattern.cols.clone());
-            let hn = find_reflection(pattern.rows.clone());
+            let vn = find_reflection(pattern.cols.clone(), false);
+            let hn = find_reflection(pattern.rows.clone(), false);
 
             assert!(vn == 0 || hn == 0);
             assert!(vn != 0 || hn != 0);
@@ -117,8 +144,22 @@ fn pt1(input: &str) -> usize {
         .sum()
 }
 
-fn pt2(_input: &str) -> usize {
-    0
+fn pt2(input: &str) -> usize {
+    let notes = Notes::from(input);
+
+    notes
+        .patterns
+        .iter()
+        .map(|pattern| {
+            let vn = find_reflection(pattern.cols.clone(), true);
+            let hn = find_reflection(pattern.rows.clone(), true);
+
+            assert!(vn == 0 || hn == 0);
+            assert!(vn != 0 || hn != 0);
+
+            vn + (100 * hn)
+        })
+        .sum()
 }
 
 pub fn day13() {
@@ -158,5 +199,28 @@ mod tests {
 ";
 
         assert_eq!(pt1(puzzle_input), 405);
+    }
+
+    #[test]
+    fn test_pt2() {
+        let puzzle_input = "\
+#.##..##.
+..#.##.#.
+##......#
+##......#
+..#.##.#.
+..##..##.
+#.#.##.#.
+
+#...##..#
+#....#..#
+..##..###
+#####.##.
+#####.##.
+..##..###
+#....#..#\
+";
+
+        assert_eq!(pt2(puzzle_input), 400);
     }
 }
