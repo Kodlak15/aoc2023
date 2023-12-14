@@ -59,9 +59,46 @@ fn is_perfect_reflection(pattern: Vec<String>, coords: (usize, usize), smudged: 
 
     match smudged {
         true => {
+            // Number of mismatched characters
             let mut k = 0;
 
-            true
+            loop {
+                if pattern[i] != pattern[j] {
+                    let ne = pattern[i]
+                        .chars()
+                        .zip(pattern[j].chars())
+                        .filter(|(c1, c2)| c1 != c2)
+                        .collect::<Vec<(char, char)>>()
+                        .len();
+
+                    if ne > 1 {
+                        return false;
+                    } else {
+                        k += 1;
+                    }
+
+                    if k > 1 {
+                        return false;
+                    }
+                }
+
+                if i == 0 {
+                    break;
+                }
+
+                if j == pattern.len() - 1 {
+                    break;
+                }
+
+                i -= 1;
+                j += 1;
+            }
+
+            // Return true if exactly one mismatched character found
+            match k == 1 {
+                true => true,
+                false => false,
+            }
         }
         false => {
             loop {
