@@ -95,10 +95,7 @@ fn is_perfect_reflection(pattern: Vec<String>, coords: (usize, usize), smudged: 
             }
 
             // Return true if exactly one mismatched character found
-            match k == 1 {
-                true => true,
-                false => false,
-            }
+            k == 1
         }
         false => {
             loop {
