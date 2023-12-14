@@ -46,8 +46,6 @@ impl Notes {
             .map(|pattern| Pattern::from(pattern))
             .collect();
 
-        // println!("Patterns: {:?}", patterns);
-
         Self { patterns }
     }
 }
@@ -56,6 +54,9 @@ impl Notes {
 // Helper Functions
 // -------------------------------------------------------
 
+// Note: there can be more than one possible line of reflection! Only one will be a perfect line
+// of reflection. If one is found to be imperfect, find the next one and try that one. See first
+// pattern in input for an example.
 fn find_reflection(pattern: Vec<String>) -> usize {
     let mut i = 0;
     let mut j = 1;
@@ -73,23 +74,39 @@ fn find_reflection(pattern: Vec<String>) -> usize {
     }
 
     if reflection == 0 {
+        // println!("Pattern: {:?}", pattern);
+        // println!("Reflection: {:?}", reflection);
+        // println!("-------------------------------------------------------");
+
         return 0;
     }
 
-    let mut i = 1;
-    let mut j = pattern.len() - 1;
+    loop {
+        println!("pattern[{:?}]: {:?}", i, pattern[i]);
+        println!("pattern[{:?}]: {:?}", j, pattern[j]);
 
-    while i < j {
         if pattern[i] != pattern[j] {
+            // println!("Pattern: {:?}", pattern);
+            // println!("Reflection: {:?}", 0);
+            // println!("-------------------------------------------------------");
+
             return 0;
         }
 
-        i += 1;
-        j -= 1;
+        if i == 0 {
+            break;
+        }
+
+        if j == pattern.len() - 1 {
+            break;
+        }
+
+        i -= 1;
+        j += 1;
     }
 
-    println!("Pattern: {:?}", pattern);
-    println!("Reflection: {:?}", reflection);
+    // println!("Pattern: {:?}", pattern);
+    // println!("Reflection: {:?}", reflection);
     println!("-------------------------------------------------------");
 
     reflection
@@ -102,18 +119,26 @@ fn find_reflection(pattern: Vec<String>) -> usize {
 fn pt1(input: &str) -> usize {
     let notes = Notes::from(input);
 
-    // For every pattern...
-    // Find number of columns to the left of the vertical line of reflection
-    // Find 100 * number of rows above the horizontal line of reflection
-    // Sum the results (unsure if there can be more than one line of reflection)
-
-    notes
+    let res: Vec<usize> = notes
         .patterns
         .iter()
         .map(|pattern| {
-            find_reflection(pattern.cols.clone()) + (100 * find_reflection(pattern.rows.clone()))
+            let vn = find_reflection(pattern.cols.clone());
+            let hn = 100 * find_reflection(pattern.rows.clone());
+
+            // Assert that one, but not both, of the values is 0
+            // This is analogous to asserting there is exactly one vertical or one horizontal line
+            // of reflection
+            assert!(vn == 0 || hn == 0);
+            assert!(vn != 0 || hn != 0);
+
+            vn + hn
         })
-        .sum()
+        .collect();
+
+    // println!("Res: {:?}", res);
+
+    res.iter().sum()
 }
 
 fn pt2(_input: &str) -> usize {
@@ -137,7 +162,7 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test1_pt1() {
+    fn test_pt1() {
         let puzzle_input = "\
 #.##..##.
 ..#.##.#.
