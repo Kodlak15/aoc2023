@@ -2,6 +2,8 @@
 // Advent of Code 2023 - Day 15
 // -------------------------------------------------------
 
+use std::collections::{HashMap, VecDeque};
+
 use crate::read_input;
 
 // -------------------------------------------------------
@@ -25,7 +27,7 @@ fn hash(mut current: u32, c: char) -> u32 {
 // -------------------------------------------------------
 
 fn pt1(input: &str) -> u32 {
-    let strings: Vec<String> = input.split(",").map(|s| s.to_string()).collect();
+    let strings: Vec<&str> = input.split(",").collect();
 
     strings
         .iter()
@@ -45,6 +47,37 @@ fn pt1(input: &str) -> u32 {
 }
 
 fn pt2(input: &str) -> usize {
+    let strings: Vec<&str> = input.split(",").collect();
+    let mut boxes: HashMap<usize, VecDeque<usize>> = HashMap::new();
+
+    for i in 0..256 {
+        boxes.insert(i, VecDeque::new());
+    }
+
+    let _ = strings.iter().map(|s| {
+        let op = match s.contains('-') || s.contains('=') {
+            true => match s.contains('-') {
+                true => '-',
+
+                false => '=',
+            },
+            false => panic!("No operation found!"),
+        };
+
+        let step: Vec<&str> = s.split(op).collect();
+
+        let mut current = 0;
+
+        for c in s.chars() {
+            current = match c {
+                '\n' => current,
+                _ => hash(current, c),
+            }
+        }
+
+        current
+    });
+
     0
 }
 
@@ -52,7 +85,7 @@ pub fn day15() {
     let input = read_input("./src/day15/puzzle_input.txt");
     println!("Day 15:");
     println!("Part 1: {}", pt1(&input));
-    println!("Part 2: {}", pt2(&input, 1000));
+    println!("Part 2: {}", pt2(&input));
     println!("-------------------------------------------------------")
 }
 
