@@ -8,6 +8,13 @@ use crate::read_input;
 // Custom Data Structures
 // -------------------------------------------------------
 
+enum Direction {
+    North,
+    West,
+    South,
+    East,
+}
+
 struct Platform {
     grid: Vec<Vec<char>>,
 }
@@ -17,6 +24,72 @@ impl Platform {
         let grid: Vec<Vec<char>> = input.lines().map(|line| line.chars().collect()).collect();
 
         Self { grid }
+    }
+
+    fn tilt(&mut self, direction: Direction) {
+        for i in 0..self.grid.len() {
+            for j in 0..self.grid[i].len() {
+                match self.grid[i][j] {
+                    'O' => match direction {
+                        Direction::North => {
+                            let mut k = i;
+
+                            while k > 0 && self.grid[k - 1][j] == '.' {
+                                self.grid[k][j] = '.';
+                                self.grid[k - 1][j] = 'O';
+                                k -= 1;
+                            }
+                        }
+                        Direction::West => {
+                            let mut k = j;
+
+                            while k > 0 && self.grid[j][k - 1] == '.' {
+                                self.grid[i][k] = '.';
+                                self.grid[i][k - 1] = 'O';
+                                k -= 1;
+                            }
+                        }
+                        Direction::South => {
+                            let mut k = i;
+
+                            while k < self.grid.len() - 1 && self.grid[k + 1][j] == '.' {
+                                self.grid[k][j] = '.';
+                                self.grid[k + 1][j] = 'O';
+                                k += 1;
+                            }
+                        }
+                        Direction::East => {
+                            let mut k = j;
+
+                            while k < self.grid[0].len() - 1 && self.grid[j][k + 1] == '.' {
+                                self.grid[i][k] = '.';
+                                self.grid[i][k + 1] = 'O';
+                                k += 1;
+                            }
+                        }
+                    },
+                    _ => (),
+                }
+            }
+        }
+    }
+
+    fn load(&self) -> usize {
+        self.grid
+            .iter()
+            .rev()
+            .enumerate()
+            .map(|(i, row)| {
+                let rounded = row
+                    .iter()
+                    .map(|c| *c)
+                    .filter(|c| *c == 'O')
+                    .collect::<Vec<char>>()
+                    .len();
+
+                rounded * (i + 1)
+            })
+            .sum()
     }
 }
 
@@ -31,26 +104,26 @@ impl Platform {
 fn pt1(input: &str) -> usize {
     let mut platform = Platform::from(input);
 
-    for i in 0..platform.grid.len() {
-        for j in 0..platform.grid[i].len() {
-            match platform.grid[i][j] {
-                'O' => {
-                    let mut k = i;
+    platform.tilt(Direction::North);
 
-                    while k > 0 && platform.grid[k - 1][j] == '.' {
-                        platform.grid[k][j] = '.';
-                        platform.grid[k - 1][j] = 'O';
-                        k -= 1;
-                    }
-                }
-                _ => (),
-            }
-        }
-    }
+    // for i in 0..platform.grid.len() {
+    //     for j in 0..platform.grid[i].len() {
+    //         match platform.grid[i][j] {
+    //             'O' => {
+    //                 let mut k = i;
+    //
+    //                 while k > 0 && platform.grid[k - 1][j] == '.' {
+    //                     platform.grid[k][j] = '.';
+    //                     platform.grid[k - 1][j] = 'O';
+    //                     k -= 1;
+    //                 }
+    //             }
+    //             _ => (),
+    //         }
+    //     }
+    // }
 
-    println!("{:?}\n\n", platform.grid);
-
-    0
+    platform.load()
 }
 
 fn pt2(input: &str) -> usize {
