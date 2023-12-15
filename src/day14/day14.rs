@@ -167,7 +167,6 @@ fn pt1(input: &str) -> usize {
 fn pt2(input: &str, cycles: usize) -> usize {
     let mut platform = Platform::from(input);
 
-    // for i in 0..1 {
     for i in 0..cycles {
         if i % 1000 == 0 {
             println!("{:?} cycles completed...", i);
@@ -228,6 +227,6 @@ O.#..O.#.#
 #OO..#....\
 ";
 
-        assert_eq!(pt2(puzzle_input, 3), 60);
+        assert_eq!(pt2(puzzle_input, 3), 69);
     }
 }
