@@ -44,7 +44,7 @@ fn pt1(input: &str) -> u32 {
         .sum()
 }
 
-fn pt2(input: &str, cycles: usize) -> usize {
+fn pt2(input: &str) -> usize {
     0
 }
 
@@ -83,11 +83,10 @@ mod tests {
         assert_eq!(pt1(puzzle_input), 1320);
     }
 
-    //     #[test]
-    //     fn test_pt2() {
-    //         let puzzle_input = "\
-    // ";
-    //
-    //         assert_eq!(pt2(puzzle_input, 3), 69);
-    //     }
+    #[test]
+    fn test_pt2() {
+        let puzzle_input = "rn=1,cm-,qp=3,cm=2,qp-,pc=4,ot=9,ab=5,pc-,pc=6,ot=7";
+
+        assert_eq!(pt2(puzzle_input), 145);
+    }
 }
