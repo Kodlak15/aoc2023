@@ -33,7 +33,6 @@ fn pt1(input: &str) -> u32 {
         .iter()
         .map(|s| {
             let mut current = 0;
-
             for c in s.chars() {
                 current = match c {
                     '\n' => current,
@@ -48,35 +47,46 @@ fn pt1(input: &str) -> u32 {
 
 fn pt2(input: &str) -> usize {
     let strings: Vec<&str> = input.split(",").collect();
-    let mut boxes: HashMap<usize, VecDeque<usize>> = HashMap::new();
+    let mut boxes: HashMap<u32, VecDeque<&str>> = HashMap::new();
 
-    for i in 0..256 {
-        boxes.insert(i, VecDeque::new());
-    }
+    // for i in 0..256 {
+    //     boxes.insert(i, VecDeque::new());
+    // }
 
-    let _ = strings.iter().map(|s| {
-        let op = match s.contains('-') || s.contains('=') {
-            true => match s.contains('-') {
-                true => '-',
+    let test: Vec<_> = strings
+        .iter()
+        .map(|s| {
+            let op = match s.contains('-') || s.contains('=') {
+                true => match s.contains('-') {
+                    true => '-',
 
-                false => '=',
-            },
-            false => panic!("No operation found!"),
-        };
+                    false => '=',
+                },
+                false => panic!("No operation found!"),
+            };
 
-        let step: Vec<&str> = s.split(op).collect();
+            let step: Vec<&str> = s.split(op).collect();
 
-        let mut current = 0;
+            match op {
+                '-' => {
+                    let label = step[0];
+                    let mut boxnum = 0;
 
-        for c in s.chars() {
-            current = match c {
-                '\n' => current,
-                _ => hash(current, c),
+                    for c in label.chars() {
+                        boxnum = hash(boxnum, c)
+                    }
+
+                    if let Some(boxn) = boxes.get_mut(&boxnum) {
+                        if let Some(index) = boxn.iter().position(|s| s == &label) {
+                            boxn.remove(index);
+                        }
+                    }
+                }
+                '=' => {}
+                _ => panic!("Invalid operation!"),
             }
-        }
-
-        current
-    });
+        })
+        .collect();
 
     0
 }
@@ -120,6 +130,6 @@ mod tests {
     fn test_pt2() {
         let puzzle_input = "rn=1,cm-,qp=3,cm=2,qp-,pc=4,ot=9,ab=5,pc-,pc=6,ot=7";
 
-        assert_eq!(pt2(puzzle_input), 145);
+        assert_eq!(pt2(puzzle_input), 0);
     }
 }
