@@ -50,60 +50,57 @@ fn pt2(input: &str) -> usize {
     // box number: (label, focal length)
     let mut boxes: HashMap<u32, VecDeque<(&str, u32)>> = HashMap::new();
 
-    let test: Vec<_> = strings
-        .iter()
-        .map(|s| {
-            let op = match s.contains('-') || s.contains('=') {
-                true => match s.contains('-') {
-                    true => '-',
+    strings.iter().for_each(|s| {
+        let op = match s.contains('-') || s.contains('=') {
+            true => match s.contains('-') {
+                true => '-',
 
-                    false => '=',
-                },
-                false => panic!("No operation found!"),
-            };
+                false => '=',
+            },
+            false => panic!("No operation found!"),
+        };
 
-            let step: Vec<&str> = s.split(op).collect();
+        let step: Vec<&str> = s.split(op).collect();
 
-            match op {
-                '-' => {
-                    let label = step[0];
-                    let mut boxnum = 0;
+        match op {
+            '-' => {
+                let label = step[0];
+                let mut boxnum = 0;
 
-                    for c in label.chars() {
-                        boxnum = hash(boxnum, c)
-                    }
+                for c in label.chars() {
+                    boxnum = hash(boxnum, c)
+                }
 
-                    if let Some(boxn) = boxes.get_mut(&boxnum) {
-                        if let Some(index) = boxn.iter().position(|(s, _)| s == &label) {
-                            boxn.remove(index);
-                        }
+                if let Some(boxn) = boxes.get_mut(&boxnum) {
+                    if let Some(index) = boxn.iter().position(|(s, _)| s == &label) {
+                        boxn.remove(index);
                     }
                 }
-                '=' => {
-                    let label = step[0];
-                    let flen: u32 = step[2].parse().expect("Could not parse focal length!");
-                    let mut boxnum = 0;
-
-                    for c in label.chars() {
-                        boxnum = hash(boxnum, c)
-                    }
-
-                    if let Some(boxn) = boxes.get_mut(&boxnum) {
-                        if let Some(index) = boxn.iter().position(|(s, _)| s == &label) {
-                            boxn[index] = (label, flen);
-                        } else {
-                            boxn.push_front((label, flen))
-                        }
-                    } else {
-                        let mut boxn: VecDeque<(&str, u32)> = VecDeque::new();
-                        boxn.push_front((label, flen));
-                        boxes.insert(boxnum, boxn);
-                    }
-                }
-                _ => panic!("Invalid operation!"),
             }
-        })
-        .collect();
+            '=' => {
+                let label = step[0];
+                let flen: u32 = step[2].parse().expect("Could not parse focal length!");
+                let mut boxnum = 0;
+
+                for c in label.chars() {
+                    boxnum = hash(boxnum, c)
+                }
+
+                if let Some(boxn) = boxes.get_mut(&boxnum) {
+                    if let Some(index) = boxn.iter().position(|(s, _)| s == &label) {
+                        boxn[index] = (label, flen);
+                    } else {
+                        boxn.push_front((label, flen))
+                    }
+                } else {
+                    let mut boxn: VecDeque<(&str, u32)> = VecDeque::new();
+                    boxn.push_front((label, flen));
+                    boxes.insert(boxnum, boxn);
+                }
+            }
+            _ => panic!("Invalid operation!"),
+        }
+    });
 
     0
 }
