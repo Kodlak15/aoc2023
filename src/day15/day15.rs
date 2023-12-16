@@ -91,7 +91,13 @@ fn pt2(input: &str) -> usize {
                     if let Some(boxn) = boxes.get_mut(&boxnum) {
                         if let Some(index) = boxn.iter().position(|(s, _)| s == &label) {
                             boxn[index] = (label, flen);
+                        } else {
+                            boxn.push_front((label, flen))
                         }
+                    } else {
+                        let mut boxn: VecDeque<(&str, u32)> = VecDeque::new();
+                        boxn.push_front((label, flen));
+                        boxes.insert(boxnum, boxn);
                     }
                 }
                 _ => panic!("Invalid operation!"),
