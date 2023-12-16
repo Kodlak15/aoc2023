@@ -47,11 +47,8 @@ fn pt1(input: &str) -> u32 {
 
 fn pt2(input: &str) -> usize {
     let strings: Vec<&str> = input.split(",").collect();
-    let mut boxes: HashMap<u32, VecDeque<&str>> = HashMap::new();
-
-    // for i in 0..256 {
-    //     boxes.insert(i, VecDeque::new());
-    // }
+    // box number: (label, focal length)
+    let mut boxes: HashMap<u32, VecDeque<(&str, u32)>> = HashMap::new();
 
     let test: Vec<_> = strings
         .iter()
@@ -77,12 +74,26 @@ fn pt2(input: &str) -> usize {
                     }
 
                     if let Some(boxn) = boxes.get_mut(&boxnum) {
-                        if let Some(index) = boxn.iter().position(|s| s == &label) {
+                        if let Some(index) = boxn.iter().position(|(s, _)| s == &label) {
                             boxn.remove(index);
                         }
                     }
                 }
-                '=' => {}
+                '=' => {
+                    let label = step[0];
+                    let flen: u32 = step[2].parse().expect("Could not parse focal length!");
+                    let mut boxnum = 0;
+
+                    for c in label.chars() {
+                        boxnum = hash(boxnum, c)
+                    }
+
+                    if let Some(boxn) = boxes.get_mut(&boxnum) {
+                        if let Some(index) = boxn.iter().position(|(s, _)| s == &label) {
+                            boxn[index] = (label, flen);
+                        }
+                    }
+                }
                 _ => panic!("Invalid operation!"),
             }
         })
