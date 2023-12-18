@@ -7,34 +7,81 @@ use regex::Regex;
 use crate::read_input;
 
 // -------------------------------------------------------
-// Global constants
-// -------------------------------------------------------
-
-#[allow(dead_code)]
-const SYMBOLS: &str = "`~!@#$%^&*()_+=";
-
-// -------------------------------------------------------
 // Custom data structures
 // -------------------------------------------------------
 
-#[allow(dead_code)]
-#[derive(Debug, Copy, Clone)]
-struct ArrayBounds {
-    rows: usize,
-    cols: usize,
+struct Schematic {
+    numbers: Vec<(u32, usize, usize, usize)>,
+    symbols: Vec<(usize, usize)>,
+    gears: Vec<(usize, usize)>,
 }
 
-#[allow(dead_code)]
-#[derive(Debug, Copy, Clone)]
-struct Coordinates {
-    row: usize,
-    col: usize,
-}
+impl Schematic {
+    fn from(input: &str) -> Self {
+        let re = Regex::new(r"\d+").expect("Could not unpack regular expression!");
 
-#[allow(dead_code)]
-impl ArrayBounds {
-    fn validate(&self, row: usize, col: usize) -> bool {
-        row < self.rows && col < self.cols
+        let numbers: Vec<(u32, usize, usize, usize)> = input
+            .lines()
+            .enumerate()
+            .filter_map(|(row, line)| {
+                let numbers: Vec<(u32, usize, usize, usize)> = re
+                    .find_iter(line)
+                    .map(|m| {
+                        let n: u32 = m.as_str().parse().expect("Could not parse string as u32!");
+                        let start = m.start();
+                        let end = m.end();
+
+                        (n, row, start, end)
+                    })
+                    .collect();
+
+                match !numbers.is_empty() {
+                    true => Some(numbers),
+                    false => None,
+                }
+            })
+            .flatten()
+            .collect();
+
+        let symbols: Vec<(usize, usize)> = input
+            .lines()
+            .enumerate()
+            .flat_map(|(i, line)| {
+                let symbols: Vec<(usize, usize)> = line
+                    .chars()
+                    .enumerate()
+                    .filter_map(|(j, c)| match !c.is_digit(10) && c != '.' {
+                        true => Some((i, j)),
+                        false => None,
+                    })
+                    .collect();
+
+                symbols
+            })
+            .collect();
+
+        let gears: Vec<(usize, usize)> = input
+            .lines()
+            .enumerate()
+            .flat_map(|(i, line)| {
+                let symbols: Vec<(usize, usize)> = line
+                    .chars()
+                    .enumerate()
+                    .filter_map(|(j, c)| match c == '*' {
+                        true => Some((i, j)),
+                        false => None,
+                    })
+                    .collect();
+
+                symbols
+            })
+            .collect();
+
+        Self {
+            numbers,
+            symbols,
+            gears,
+        }
     }
 }
 
@@ -42,24 +89,14 @@ impl ArrayBounds {
 // Helper Functions
 // -------------------------------------------------------
 
-#[allow(dead_code)]
-fn adjacent_coords(
-    bounds: ArrayBounds,
-    row: usize,
-    col_start: usize,
-    col_end: usize,
-) -> Vec<Coordinates> {
-    let mut adjacent: Vec<Coordinates> = vec![];
-
-    for i in row.saturating_sub(1)..row + 2 {
-        for j in col_start.saturating_sub(1)..col_end + 2 {
-            if bounds.validate(i, j) {
-                adjacent.push(Coordinates { row: i, col: j });
-            }
-        }
-    }
-
-    adjacent
+fn box_coords(row: usize, start: usize, end: usize) -> Vec<(usize, usize)> {
+    (row.saturating_sub(1)..row + 2)
+        .flat_map(|i| {
+            (start.saturating_sub(1)..end + 1)
+                .map(|j| (i, j))
+                .collect::<Vec<(usize, usize)>>()
+        })
+        .collect()
 }
 
 // -------------------------------------------------------
@@ -67,21 +104,24 @@ fn adjacent_coords(
 // -------------------------------------------------------
 
 fn pt1(input: &str) -> u32 {
-    let schematic: Vec<&str> = input.lines().map(|line| line.trim()).collect();
-    let _bounds = ArrayBounds {
-        rows: schematic.len(),
-        cols: schematic[0].len(),
-    };
+    let schematic = Schematic::from(input);
 
-    let _re = Regex::new(r"\d+").unwrap();
-    // TODO
+    schematic
+        .numbers
+        .iter()
+        .filter_map(|(n, row, start, end)| {
+            let coords = box_coords(*row, *start, *end);
 
-    0
+            match coords.iter().any(|coord| schematic.symbols.contains(coord)) {
+                true => Some(n),
+                false => None,
+            }
+        })
+        .sum()
 }
 
 #[allow(dead_code)]
 fn pt2(_input: &str) -> u32 {
-    // TODO
     0
 }
 
@@ -99,25 +139,25 @@ pub fn day03() {
 
 #[cfg(test)]
 mod tests {
-    // use super::*;
+    use super::*;
 
-    //    #[test]
-    //    fn test_pt1() {
-    //        let input = "\
-    // 467..114..
-    // ...*......
-    // ..35..633.
-    // ......#...
-    // 617*......
-    // .....+.58.
-    // ..592.....
-    // ......755.
-    // ...$.*....
-    // .664.598..\
-    // ";
-    //
-    //        assert_eq!(pt1(input), 4361);
-    //    }
+    #[test]
+    fn test_pt1() {
+        let input = "\
+467..114..
+...*......
+..35..633.
+......#...
+617*......
+.....+.58.
+..592.....
+......755.
+...$.*....
+.664.598..\
+    ";
+
+        assert_eq!(pt1(input), 4361);
+    }
 
     // #[test]
     // fn test_pt2() {
