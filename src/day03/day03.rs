@@ -2,6 +2,8 @@
 // Advent of Code 2023 - Day 3
 // -------------------------------------------------------
 
+use std::collections::HashMap;
+
 use regex::Regex;
 
 use crate::read_input;
@@ -121,15 +123,45 @@ fn pt1(input: &str) -> u32 {
 }
 
 #[allow(dead_code)]
-fn pt2(_input: &str) -> u32 {
-    0
+fn pt2(input: &str) -> u32 {
+    let schematic = Schematic::from(input);
+    let mut gears: HashMap<(usize, usize), Vec<u32>> = HashMap::new();
+
+    schematic.numbers.iter().for_each(|(n, row, start, end)| {
+        let coords: Vec<(usize, usize)> = box_coords(*row, *start, *end)
+            .iter()
+            .filter_map(|coord| match schematic.gears.contains(coord) {
+                true => Some(*coord),
+                false => None,
+            })
+            .collect();
+
+        coords.iter().for_each(|coord| match !coords.is_empty() {
+            true => {
+                if let Some(nums) = gears.get_mut(coord) {
+                    nums.push(*n);
+                } else {
+                    gears.insert(*coord, vec![*n]);
+                }
+            }
+            false => (),
+        })
+    });
+
+    gears
+        .iter()
+        .map(|(_, nums)| match nums.len() == 2 {
+            true => nums[0] * nums[1],
+            false => 0,
+        })
+        .sum()
 }
 
 pub fn day03() {
     let input = read_input("./src/day03/puzzle_input.txt");
     println!("Day 3:");
     println!("Part 1: {}", pt1(&input));
-    // println!("Part 2: {}", pt2(&input));
+    println!("Part 2: {}", pt2(&input));
     println!("-------------------------------------------------------")
 }
 
@@ -159,8 +191,21 @@ mod tests {
         assert_eq!(pt1(input), 4361);
     }
 
-    // #[test]
-    // fn test_pt2() {
-    //     unimplemented!()
-    // }
+    #[test]
+    fn test_pt2() {
+        let input = "\
+467..114..
+...*......
+..35..633.
+......#...
+617*......
+.....+.58.
+..592.....
+......755.
+...$.*....
+.664.598..\
+    ";
+
+        assert_eq!(pt2(input), 467835);
+    }
 }
