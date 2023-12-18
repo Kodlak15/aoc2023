@@ -122,7 +122,6 @@ fn pt1(input: &str) -> u32 {
         .sum()
 }
 
-#[allow(dead_code)]
 fn pt2(input: &str) -> u32 {
     let schematic = Schematic::from(input);
     let mut gears: HashMap<(usize, usize), Vec<u32>> = HashMap::new();
