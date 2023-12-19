@@ -10,6 +10,7 @@ use crate::read_input;
 // Custom Data Structures
 // -------------------------------------------------------
 
+#[derive(PartialEq, Clone, Copy)]
 struct Node {
     row: usize,
     col: usize,
@@ -22,6 +23,7 @@ impl Node {
     }
 }
 
+#[derive(PartialEq)]
 struct Edge {
     from: Node,
     to: Node,
@@ -58,7 +60,33 @@ impl Graph {
 
         (0..nrows).for_each(|row| {
             (0..ncols).for_each(|col| {
-                let adjacent = adjacent_coords(row, col, nrows, ncols);
+                let u = Node::from(row, col, grid[row][col]);
+
+                let adjacent_coords = adjacent_coords(row, col, nrows, ncols);
+                let adjacent_nodes = adjacent_coords
+                    .iter()
+                    .map(|(i, j)| Node::from(*i, *j, grid[*i][*j]));
+
+                if !nodes.contains(&u) {
+                    nodes.push(u);
+                }
+
+                adjacent_nodes.for_each(|v| {
+                    if !nodes.contains(&v) {
+                        nodes.push(v)
+                    }
+
+                    let e1 = Edge::from(u, v, v.loss);
+                    let e2 = Edge::from(v, u, u.loss);
+
+                    if !edges.contains(&e1) {
+                        edges.push(e1);
+                    }
+
+                    if !edges.contains(&e2) {
+                        edges.push(e2);
+                    }
+                })
             })
         });
 
