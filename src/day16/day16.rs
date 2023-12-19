@@ -2,7 +2,7 @@
 // Advent of Code 2023 - Day 16
 // -------------------------------------------------------
 
-use std::collections::VecDeque;
+use std::collections::HashSet;
 
 use crate::read_input;
 
@@ -40,7 +40,7 @@ impl Splitter {
     }
 }
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 enum Beam {
     Up((usize, usize)),
     Down((usize, usize)),
@@ -57,15 +57,6 @@ impl Beam {
             Beam::Right(coords) => *coords,
         }
     }
-
-    // fn next(&self) -> Self {
-    //     match self {
-    //         Beam::Up((i, j)) => Beam::Up((*i, j.saturating_sub(1))),
-    //         Beam::Down((i, j)) => Beam::Down((*i, *j + 1)),
-    //         Beam::Left((i, j)) => Beam::Left((i.saturating_sub(1), *j)),
-    //         Beam::Right((i, j)) => Beam::Right((*i + 1, *j)),
-    //     }
-    // }
 
     fn next(&self) -> Self {
         match self {
@@ -124,75 +115,94 @@ impl Beam {
 }
 
 // -------------------------------------------------------
-// Main Program Logic
+// Helper Functions
 // -------------------------------------------------------
 
-fn pt1(input: &str) -> usize {
-    let mut beams: VecDeque<Beam> = VecDeque::new();
-    beams.push_front(Beam::Right((0, 0)));
-
-    let grid: Vec<Vec<char>> = input
-        .lines()
-        .map(|line| line.chars().collect::<Vec<char>>())
-        .collect();
+fn helper(beams: &mut HashSet<Beam>, grid: Vec<Vec<char>>) -> () {
+    let mut seen: HashSet<Beam> = beams.clone();
 
     let nrows = grid.len();
     let ncols = grid[0].len();
 
-    let mut energized: Vec<(usize, usize)> = vec![(0, 0)];
-
-    // Temporary
-    let mut temp = 0;
+    let mut energized: HashSet<(usize, usize)> = HashSet::new();
+    energized.insert((0, 0));
 
     while !beams.is_empty() {
         beams = beams
             .iter()
             .flat_map(|beam| {
                 let (i, j) = beam.coords();
-
                 let c = grid[i][j];
 
-                // println!("Current beam: {:?}", beam);
-                // println!("Next beam: {:?}", beam.next());
-                // println!("c: {:?}", c);
-
-                match c {
-                    '.' => vec![beam.next()],
+                let new_beams: Vec<Beam> = match c {
+                    '.' => vec![beam.next()]
+                        .iter()
+                        .filter_map(|new_beam| {
+                            match new_beam.coords() != (i, j) && !seen.contains(new_beam) {
+                                true => {
+                                    seen.insert(*new_beam);
+                                    Some(*new_beam)
+                                }
+                                false => None,
+                            }
+                        })
+                        .collect(),
                     '/' => vec![beam.reflect('/')]
                         .iter()
-                        .filter_map(|new_beam| match new_beam.coords() != (i, j) {
-                            true => Some(*new_beam),
-                            false => None,
+                        .filter_map(|new_beam| {
+                            match new_beam.coords() != (i, j) && !seen.contains(new_beam) {
+                                true => {
+                                    seen.insert(*new_beam);
+                                    Some(*new_beam)
+                                }
+                                false => None,
+                            }
                         })
                         .collect(),
                     '\\' => vec![beam.reflect('\\')]
                         .iter()
-                        .filter_map(|new_beam| match new_beam.coords() != (i, j) {
-                            true => Some(*new_beam),
-                            false => None,
+                        .filter_map(|new_beam| {
+                            match new_beam.coords() != (i, j) && !seen.contains(new_beam) {
+                                true => {
+                                    seen.insert(*new_beam);
+                                    Some(*new_beam)
+                                }
+                                false => None,
+                            }
                         })
                         .collect(),
                     '|' => beam
                         .split('|')
                         .iter()
-                        .filter_map(|new_beam| match new_beam.coords() != (i, j) {
-                            true => Some(*new_beam),
-                            false => None,
+                        .filter_map(|new_beam| {
+                            match new_beam.coords() != (i, j) && !seen.contains(new_beam) {
+                                true => {
+                                    seen.insert(*new_beam);
+                                    Some(*new_beam)
+                                }
+                                false => None,
+                            }
                         })
                         .collect(),
                     '-' => beam
                         .split('-')
                         .iter()
-                        .filter_map(|new_beam| match new_beam.coords() != (i, j) {
-                            true => Some(*new_beam),
-                            false => None,
+                        .filter_map(|new_beam| {
+                            match new_beam.coords() != (i, j) && !seen.contains(new_beam) {
+                                true => {
+                                    seen.insert(*new_beam);
+                                    Some(*new_beam)
+                                }
+                                false => None,
+                            }
                         })
                         .collect(),
                     _ => panic!("Invalid character found in grid!"),
-                }
+                };
+
+                new_beams
             })
             .filter_map(|beam| {
-                // println!("Beam: {:?}", beam);
                 let (row, col) = beam.coords();
 
                 match row < nrows && col < ncols {
@@ -203,24 +213,119 @@ fn pt1(input: &str) -> usize {
             .collect();
 
         beams.iter().for_each(|beam| {
-            let coords = beam.coords();
-
-            if !energized.contains(&coords) {
-                energized.push(coords);
-            }
+            energized.insert(beam.coords());
         });
+    }
+}
 
-        temp += 1;
+// -------------------------------------------------------
+// Main Program Logic
+// -------------------------------------------------------
 
-        if temp % 100 == 0 {
-            println!("Beams length: {:?}", beams.len());
-        }
+fn pt1(input: &str) -> usize {
+    let mut beams: HashSet<Beam> = HashSet::new();
+    beams.insert(Beam::Right((0, 0)));
+    let mut seen: HashSet<Beam> = beams.clone();
 
-        println!("Beams: {:?}\n", beams);
+    let grid: Vec<Vec<char>> = input
+        .lines()
+        .map(|line| line.chars().collect::<Vec<char>>())
+        .collect();
 
-        if temp == 10 {
-            break;
-        }
+    let nrows = grid.len();
+    let ncols = grid[0].len();
+
+    let mut energized: HashSet<(usize, usize)> = HashSet::new();
+    energized.insert((0, 0));
+
+    while !beams.is_empty() {
+        beams = beams
+            .iter()
+            .flat_map(|beam| {
+                let (i, j) = beam.coords();
+                let c = grid[i][j];
+
+                let new_beams: Vec<Beam> = match c {
+                    '.' => vec![beam.next()]
+                        .iter()
+                        .filter_map(|new_beam| {
+                            match new_beam.coords() != (i, j) && !seen.contains(new_beam) {
+                                true => {
+                                    seen.insert(*new_beam);
+                                    Some(*new_beam)
+                                }
+                                false => None,
+                            }
+                        })
+                        .collect(),
+                    '/' => vec![beam.reflect('/')]
+                        .iter()
+                        .filter_map(|new_beam| {
+                            match new_beam.coords() != (i, j) && !seen.contains(new_beam) {
+                                true => {
+                                    seen.insert(*new_beam);
+                                    Some(*new_beam)
+                                }
+                                false => None,
+                            }
+                        })
+                        .collect(),
+                    '\\' => vec![beam.reflect('\\')]
+                        .iter()
+                        .filter_map(|new_beam| {
+                            match new_beam.coords() != (i, j) && !seen.contains(new_beam) {
+                                true => {
+                                    seen.insert(*new_beam);
+                                    Some(*new_beam)
+                                }
+                                false => None,
+                            }
+                        })
+                        .collect(),
+                    '|' => beam
+                        .split('|')
+                        .iter()
+                        .filter_map(|new_beam| {
+                            match new_beam.coords() != (i, j) && !seen.contains(new_beam) {
+                                true => {
+                                    seen.insert(*new_beam);
+                                    Some(*new_beam)
+                                }
+                                false => None,
+                            }
+                        })
+                        .collect(),
+                    '-' => beam
+                        .split('-')
+                        .iter()
+                        .filter_map(|new_beam| {
+                            match new_beam.coords() != (i, j) && !seen.contains(new_beam) {
+                                true => {
+                                    seen.insert(*new_beam);
+                                    Some(*new_beam)
+                                }
+                                false => None,
+                            }
+                        })
+                        .collect(),
+                    _ => panic!("Invalid character found in grid!"),
+                };
+
+                new_beams
+            })
+            .filter_map(|beam| {
+                let (row, col) = beam.coords();
+
+                match row < nrows && col < ncols {
+                    true => Some(beam),
+                    false => None,
+                }
+            })
+            .collect();
+
+        beams.iter().for_each(|beam| {
+            energized.insert(beam.coords());
+        });
     }
 
     energized.len()
