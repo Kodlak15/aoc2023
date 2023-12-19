@@ -2,7 +2,7 @@
 // Advent of Code 2023 - Day 17
 // -------------------------------------------------------
 
-use std::collections::HashSet;
+use std::collections::{HashMap, HashSet};
 
 use crate::read_input;
 
@@ -37,9 +37,10 @@ impl Edge {
 }
 
 struct Graph {
-    start: Node,
+    source: Node,
     nodes: HashSet<Node>,
     edges: HashSet<Edge>,
+    destination: Node,
 }
 
 impl Graph {
@@ -56,7 +57,8 @@ impl Graph {
         let nrows = grid.len();
         let ncols = grid[0].len();
 
-        let start = Node::from(0, 0, grid[0][0]);
+        let source = Node::from(0, 0, grid[0][0]);
+        let destination = Node::from(nrows - 1, ncols - 1, grid[nrows - 1][ncols - 1]);
 
         let mut nodes: HashSet<Node> = HashSet::new();
         let mut edges: HashSet<Edge> = HashSet::new();
@@ -85,9 +87,10 @@ impl Graph {
         assert!(nodes.len() == nrows * ncols);
 
         Self {
-            start,
+            source,
             nodes,
             edges,
+            destination,
         }
     }
 }
@@ -125,12 +128,7 @@ fn adjacent_coords(row: usize, col: usize, nrows: usize, ncols: usize) -> Vec<(u
 fn pt1(input: &str) -> u32 {
     let graph = Graph::from(input);
 
-    println!("Start: {:?}", graph.start);
-
-    // let mut losses: HashSet<Node, u32>
-
-    // println!("Nodes: {:?}", graph.nodes);
-    // println!("Edges: {:?}", graph.edges);
+    let mut losses: HashMap<Node, u32> = graph.nodes.iter().map(|node| (*node, u32::MAX)).collect();
 
     0
 }
