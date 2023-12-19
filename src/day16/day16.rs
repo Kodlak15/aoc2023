@@ -67,19 +67,31 @@ impl Beam {
         }
     }
 
-    fn reflect(&self, mirror: char) -> Self {
+    fn reflect(&self, mirror: char) -> Vec<Self> {
         match Mirror::from(mirror) {
             Mirror::Positive => match self {
-                Beam::Up((i, j)) => Beam::Right((*i + 1, *j)),
-                Beam::Down((i, j)) => Beam::Left((*i - 1, *j)),
-                Beam::Left((i, j)) => Beam::Down((*i, *j - 1)),
-                Beam::Right((i, j)) => Beam::Up((*i, *j + 1)),
+                Beam::Up((i, j)) => vec![Beam::Right((*i + 1, *j))],
+                Beam::Down((i, j)) => match *j > 0 {
+                    true => vec![Beam::Left((*i - 1, *j))],
+                    false => vec![],
+                },
+                Beam::Left((i, j)) => match *i > 0 {
+                    true => vec![Beam::Down((*i, *j - 1))],
+                    false => vec![],
+                },
+                Beam::Right((i, j)) => vec![Beam::Up((*i, *j + 1))],
             },
             Mirror::Negative => match self {
-                Beam::Up((i, j)) => Beam::Left((*i - 1, *j)),
-                Beam::Down((i, j)) => Beam::Right((*i + 1, *j)),
-                Beam::Left((i, j)) => Beam::Up((*i, *j + 1)),
-                Beam::Right((i, j)) => Beam::Down((*i, *j - 1)),
+                Beam::Up((i, j)) => match *i > 0 {
+                    true => vec![Beam::Left((*i - 1, *j))],
+                    false => vec![],
+                },
+                Beam::Down((i, j)) => vec![Beam::Right((*i + 1, *j))],
+                Beam::Left((i, j)) => vec![Beam::Up((*i, *j + 1))],
+                Beam::Right((i, j)) => match *j > 0 {
+                    true => vec![Beam::Down((*i, *j - 1))],
+                    false => vec![],
+                },
             },
         }
     }
@@ -106,7 +118,7 @@ impl Beam {
 // Main Program Logic
 // -------------------------------------------------------
 
-fn pt1(input: &str) -> u32 {
+fn pt1(input: &str) -> usize {
     let mut beams: VecDeque<Beam> = VecDeque::new();
     beams.push_front(Beam::Right((0, 0)));
 
@@ -121,7 +133,6 @@ fn pt1(input: &str) -> u32 {
     let mut energized: Vec<(usize, usize)> = vec![(0, 0)];
 
     while !beams.is_empty() {
-        //
         beams = beams
             .iter()
             .flat_map(|beam| {
@@ -155,7 +166,7 @@ fn pt1(input: &str) -> u32 {
         });
     }
 
-    0
+    energized.len()
 }
 
 fn pt2(_input: &str) -> u32 {
