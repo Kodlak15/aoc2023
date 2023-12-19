@@ -13,12 +13,19 @@ use crate::read_input;
 struct Node {
     row: usize,
     col: usize,
-    loss: usize,
+    loss: u32,
+}
+
+impl Node {
+    fn from(row: usize, col: usize, loss: u32) -> Self {
+        Self { row, col, loss }
+    }
 }
 
 struct Edge {
     from: Node,
     to: Node,
+    weight: u32,
 }
 
 struct Graph {
@@ -28,6 +35,21 @@ struct Graph {
 
 impl Graph {
     fn from(input: &str) -> Self {
+        let nodes: Vec<Node> = input
+            .lines()
+            .enumerate()
+            .flat_map(|(i, line)| {
+                line.chars()
+                    .enumerate()
+                    .map(|(j, c)| {
+                        let loss: u32 = c.to_digit(10).expect("Could not parse character as u32!");
+
+                        Node::from(i, j, loss)
+                    })
+                    .collect::<Vec<Node>>()
+            })
+            .collect();
+
         Self {
             nodes: vec![],
             edges: vec![],
