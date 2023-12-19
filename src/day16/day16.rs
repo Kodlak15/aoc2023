@@ -100,14 +100,32 @@ impl Beam {
         match Splitter::from(splitter) {
             Splitter::Vertical => match self {
                 Beam::Up((i, j)) => vec![Beam::Up((*i, *j + 1))],
-                Beam::Down((i, j)) => vec![Beam::Down((*i, *j - 1))],
-                Beam::Left((i, j)) => vec![Beam::Up((*i, *j + 1)), Beam::Down((*i, *j - 1))],
-                Beam::Right((i, j)) => vec![Beam::Up((*i, *j + 1)), Beam::Down((*i, *j - 1))],
+                Beam::Down((i, j)) => match *j > 0 {
+                    true => vec![Beam::Down((*i, *j - 1))],
+                    false => vec![],
+                },
+                Beam::Left((i, j)) => match *j > 0 {
+                    true => vec![Beam::Up((*i, *j + 1)), Beam::Down((*i, *j - 1))],
+                    false => vec![Beam::Up((*i, *j + 1))],
+                },
+                Beam::Right((i, j)) => match *j > 0 {
+                    true => vec![Beam::Up((*i, *j + 1)), Beam::Down((*i, *j - 1))],
+                    false => vec![Beam::Up((*i, *j + 1))],
+                },
             },
             Splitter::Horizontal => match self {
-                Beam::Up((i, j)) => vec![Beam::Left((*i - 1, *j)), Beam::Right((*i + 1, *j))],
-                Beam::Down((i, j)) => vec![Beam::Left((*i - 1, *j)), Beam::Right((*i + 1, *j))],
-                Beam::Left((i, j)) => vec![Beam::Left((*i - 1, *j))],
+                Beam::Up((i, j)) => match *i > 0 {
+                    true => vec![Beam::Left((*i - 1, *j)), Beam::Right((*i + 1, *j))],
+                    false => vec![Beam::Right((*i + 1, *j))],
+                },
+                Beam::Down((i, j)) => match *i > 0 {
+                    true => vec![Beam::Left((*i - 1, *j)), Beam::Right((*i + 1, *j))],
+                    false => vec![Beam::Right((*i + 1, *j))],
+                },
+                Beam::Left((i, j)) => match *i > 0 {
+                    true => vec![Beam::Left((*i - 1, *j))],
+                    false => vec![],
+                },
                 Beam::Right((i, j)) => vec![Beam::Right((*i + 1, *j))],
             },
         }
