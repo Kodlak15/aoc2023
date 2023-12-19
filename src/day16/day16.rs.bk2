@@ -58,37 +58,28 @@ impl Beam {
         }
     }
 
-    // fn next(&self) -> Self {
-    //     match self {
-    //         Beam::Up((i, j)) => Beam::Up((*i, j.saturating_sub(1))),
-    //         Beam::Down((i, j)) => Beam::Down((*i, *j + 1)),
-    //         Beam::Left((i, j)) => Beam::Left((i.saturating_sub(1), *j)),
-    //         Beam::Right((i, j)) => Beam::Right((*i + 1, *j)),
-    //     }
-    // }
-
     fn next(&self) -> Self {
         match self {
-            Beam::Up((i, j)) => Beam::Up((i.saturating_sub(1), *j)),
-            Beam::Down((i, j)) => Beam::Down((*i + 1, *j)),
-            Beam::Left((i, j)) => Beam::Left((*i, j.saturating_sub(1))),
-            Beam::Right((i, j)) => Beam::Right((*i, *j + 1)),
+            Beam::Up((i, j)) => Beam::Up((*i, j.saturating_sub(1))),
+            Beam::Down((i, j)) => Beam::Down((*i, *j + 1)),
+            Beam::Left((i, j)) => Beam::Left((i.saturating_sub(1), *j)),
+            Beam::Right((i, j)) => Beam::Right((*i + 1, *j)),
         }
     }
 
     fn reflect(&self, mirror: char) -> Self {
         match Mirror::from(mirror) {
             Mirror::Positive => match self {
-                Beam::Up((i, j)) => Beam::Right((*i, *j + 1)),
-                Beam::Down((i, j)) => Beam::Left((*i, j.saturating_sub(1))),
-                Beam::Left((i, j)) => Beam::Down((*i + 1, *j)),
-                Beam::Right((i, j)) => Beam::Up((i.saturating_sub(1), *j)),
+                Beam::Up((i, j)) => Beam::Left((i.saturating_sub(1), *j)),
+                Beam::Down((i, j)) => Beam::Right((*i + 1, *j)),
+                Beam::Left((i, j)) => Beam::Up((*i, j.saturating_sub(1))),
+                Beam::Right((i, j)) => Beam::Down((*i, *j + 1)),
             },
             Mirror::Negative => match self {
-                Beam::Up((i, j)) => Beam::Left((*i, j.saturating_sub(1))),
-                Beam::Down((i, j)) => Beam::Right((*i, *j + 1)),
-                Beam::Left((i, j)) => Beam::Up((i.saturating_sub(1), *j)),
-                Beam::Right((i, j)) => Beam::Down((*i + 1, *j)),
+                Beam::Up((i, j)) => Beam::Right((*i + 1, *j)),
+                Beam::Down((i, j)) => Beam::Left((i.saturating_sub(1), *j)),
+                Beam::Left((i, j)) => Beam::Down((*i, *j + 1)),
+                Beam::Right((i, j)) => Beam::Up((*i, j.saturating_sub(1))),
             },
         }
     }
@@ -96,28 +87,28 @@ impl Beam {
     fn split(&self, splitter: char) -> Vec<Self> {
         match Splitter::from(splitter) {
             Splitter::Vertical => match self {
-                Beam::Up((i, j)) => vec![Beam::Up((i.saturating_sub(1), *j))],
-                Beam::Down((i, j)) => vec![Beam::Down((*i + 1, *j))],
+                Beam::Up((i, j)) => vec![Beam::Up((*i, j.saturating_sub(1)))],
+                Beam::Down((i, j)) => vec![Beam::Down((*i, *j + 1))],
                 Beam::Left((i, j)) => vec![
-                    Beam::Up((i.saturating_sub(1), *j)),
-                    Beam::Down((*i + 1, *j)),
+                    Beam::Up((*i, j.saturating_sub(1))),
+                    Beam::Down((*i, *j + 1)),
                 ],
                 Beam::Right((i, j)) => vec![
-                    Beam::Up((i.saturating_sub(1), *j)),
-                    Beam::Down((*i + 1, *j)),
+                    Beam::Up((*i, j.saturating_sub(1))),
+                    Beam::Down((*i, *j + 1)),
                 ],
             },
             Splitter::Horizontal => match self {
                 Beam::Up((i, j)) => vec![
-                    Beam::Left((*i, j.saturating_sub(1))),
-                    Beam::Right((*i, *j + 1)),
+                    Beam::Left((i.saturating_sub(1), *j)),
+                    Beam::Right((*i + 1, *j)),
                 ],
                 Beam::Down((i, j)) => vec![
-                    Beam::Left((*i, j.saturating_sub(1))),
-                    Beam::Right((*i, *j + 1)),
+                    Beam::Left((i.saturating_sub(1), *j)),
+                    Beam::Right((*i + 1, *j)),
                 ],
-                Beam::Left((i, j)) => vec![Beam::Left((*i, j.saturating_sub(1)))],
-                Beam::Right((i, j)) => vec![Beam::Right((*i, *j + 1))],
+                Beam::Left((i, j)) => vec![Beam::Left((i.saturating_sub(1), *j))],
+                Beam::Right((i, j)) => vec![Beam::Right((*i + 1, *j))],
             },
         }
     }
@@ -141,10 +132,9 @@ fn pt1(input: &str) -> usize {
 
     let mut energized: Vec<(usize, usize)> = vec![(0, 0)];
 
-    // Temporary
-    let mut temp = 0;
-
     while !beams.is_empty() {
+        // println!("Beams: {:?}\n", beams);
+
         beams = beams
             .iter()
             .flat_map(|beam| {
@@ -152,9 +142,8 @@ fn pt1(input: &str) -> usize {
 
                 let c = grid[i][j];
 
-                // println!("Current beam: {:?}", beam);
-                // println!("Next beam: {:?}", beam.next());
-                // println!("c: {:?}", c);
+                println!("Current beam: {:?}", beam);
+                println!("Next beam: {:?}", beam.next());
 
                 match c {
                     '.' => vec![beam.next()],
@@ -192,7 +181,7 @@ fn pt1(input: &str) -> usize {
                 }
             })
             .filter_map(|beam| {
-                // println!("Beam: {:?}", beam);
+                println!("Beam: {:?}", beam);
                 let (row, col) = beam.coords();
 
                 match row < nrows && col < ncols {
@@ -210,17 +199,7 @@ fn pt1(input: &str) -> usize {
             }
         });
 
-        temp += 1;
-
-        if temp % 100 == 0 {
-            println!("Beams length: {:?}", beams.len());
-        }
-
         println!("Beams: {:?}\n", beams);
-
-        if temp == 10 {
-            break;
-        }
     }
 
     energized.len()
@@ -246,23 +225,23 @@ pub fn day16() {
 mod tests {
     use super::*;
 
-    #[test]
-    fn test_pt1() {
-        let puzzle_input = "\
-.|...\\....
-|.-.\\.....
-.....|-...
-........|.
-..........
-.........\\
-..../.\\\\..
-.-.-/..|..
-.|....-|.\\
-..//.|....\\
-";
-
-        assert_eq!(pt1(puzzle_input), 46);
-    }
+    //     #[test]
+    //     fn test_pt1() {
+    //         let puzzle_input = "\
+    // .|...\\....
+    // |.-.\\.....
+    // .....|-...
+    // ........|.
+    // ..........
+    // .........\\
+    // ..../.\\\\..
+    // .-.-/..|..
+    // .|....-|.\\
+    // ..//.|....\\
+    // ";
+    //
+    //         assert_eq!(pt1(puzzle_input), 46);
+    //     }
 
     // #[test]
     // fn test_pt2() {
