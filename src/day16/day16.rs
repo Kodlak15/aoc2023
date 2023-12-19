@@ -58,19 +58,28 @@ impl Beam {
         }
     }
 
+    fn next(&self) -> Self {
+        match self {
+            Beam::Up((i, j)) => Beam::Up((*i, *j + 1)),
+            Beam::Down((i, j)) => Beam::Down((*i, *j - 1)),
+            Beam::Left((i, j)) => Beam::Left((*i - 1, *j)),
+            Beam::Right((i, j)) => Beam::Right((*i + 1, *j)),
+        }
+    }
+
     fn reflect(&self, mirror: char) -> Self {
         match Mirror::from(mirror) {
             Mirror::Positive => match self {
-                Beam::Up(coords) => Beam::Right(*coords),
-                Beam::Down(coords) => Beam::Left(*coords),
-                Beam::Left(coords) => Beam::Down(*coords),
-                Beam::Right(coords) => Beam::Up(*coords),
+                Beam::Up((i, j)) => Beam::Right((*i + 1, *j)),
+                Beam::Down((i, j)) => Beam::Left((*i - 1, *j)),
+                Beam::Left((i, j)) => Beam::Down((*i, *j - 1)),
+                Beam::Right((i, j)) => Beam::Up((*i, *j + 1)),
             },
             Mirror::Negative => match self {
-                Beam::Up(coords) => Beam::Left(*coords),
-                Beam::Down(coords) => Beam::Right(*coords),
-                Beam::Left(coords) => Beam::Up(*coords),
-                Beam::Right(coords) => Beam::Down(*coords),
+                Beam::Up((i, j)) => Beam::Left((*i - 1, *j)),
+                Beam::Down((i, j)) => Beam::Right((*i + 1, *j)),
+                Beam::Left((i, j)) => Beam::Up((*i, *j + 1)),
+                Beam::Right((i, j)) => Beam::Down((*i, *j - 1)),
             },
         }
     }
@@ -78,16 +87,16 @@ impl Beam {
     fn split(&self, splitter: char) -> Vec<Self> {
         match Splitter::from(splitter) {
             Splitter::Vertical => match self {
-                Beam::Up(coords) => vec![Beam::Up(*coords)],
-                Beam::Down(coords) => vec![Beam::Down(*coords)],
-                Beam::Left(coords) => vec![Beam::Up(*coords), Beam::Down(*coords)],
-                Beam::Right(coords) => vec![Beam::Up(*coords), Beam::Down(*coords)],
+                Beam::Up((i, j)) => vec![Beam::Up((*i, *j + 1))],
+                Beam::Down((i, j)) => vec![Beam::Down((*i, *j - 1))],
+                Beam::Left((i, j)) => vec![Beam::Up((*i, *j + 1)), Beam::Down((*i, *j - 1))],
+                Beam::Right((i, j)) => vec![Beam::Up((*i, *j + 1)), Beam::Down((*i, *j - 1))],
             },
             Splitter::Horizontal => match self {
-                Beam::Up(coords) => vec![Beam::Left(*coords), Beam::Right(*coords)],
-                Beam::Down(coords) => vec![Beam::Left(*coords), Beam::Right(*coords)],
-                Beam::Left(coords) => vec![Beam::Left(*coords)],
-                Beam::Right(coords) => vec![Beam::Right(*coords)],
+                Beam::Up((i, j)) => vec![Beam::Left((*i - 1, *j)), Beam::Right((*i + 1, *j))],
+                Beam::Down((i, j)) => vec![Beam::Left((*i - 1, *j)), Beam::Right((*i + 1, *j))],
+                Beam::Left((i, j)) => vec![Beam::Left((*i - 1, *j))],
+                Beam::Right((i, j)) => vec![Beam::Right((*i + 1, *j))],
             },
         }
     }
@@ -109,9 +118,16 @@ fn pt1(input: &str) -> u32 {
     let nrows = grid.len();
     let ncols = grid[0].len();
 
-    let mut energized: Vec<(usize, usize)> = Vec::new();
+    let mut energized: Vec<(usize, usize)> = vec![(0, 0)];
 
     while !beams.is_empty() {
+        //
+        beams.iter().map(|beam| {
+            let (i, j) = beam.coords();
+
+            // match grid[i][j] {}
+        });
+
         beams = beams
             .iter()
             .filter_map(|beam| {
