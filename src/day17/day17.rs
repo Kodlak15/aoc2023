@@ -2,7 +2,38 @@
 // Advent of Code 2023 - Day 17
 // -------------------------------------------------------
 
+use std::rc::Rc;
+
 use crate::read_input;
+
+// -------------------------------------------------------
+// Custom Data Structures
+// -------------------------------------------------------
+
+struct Node {
+    row: usize,
+    col: usize,
+    loss: usize,
+}
+
+struct Edge {
+    from: Node,
+    to: Node,
+}
+
+struct Graph {
+    nodes: Vec<Node>,
+    edges: Vec<Edge>,
+}
+
+impl Graph {
+    fn from(input: &str) -> Self {
+        Self {
+            nodes: vec![],
+            edges: vec![],
+        }
+    }
+}
 
 // -------------------------------------------------------
 // Helper Functions
@@ -12,7 +43,7 @@ use crate::read_input;
 // Main Program Logic
 // -------------------------------------------------------
 
-fn pt1(_input: &str) -> u32 {
+fn pt1(input: &str) -> u32 {
     0
 }
 
@@ -34,13 +65,27 @@ pub fn day17() {
 
 #[cfg(test)]
 mod tests {
-    // use super::*;
+    use super::*;
 
     #[test]
     fn test_pt1() {
-        // let puzzle_input = "";
+        let puzzle_input = "\
+2413432311323
+3215453535623
+3255245654254
+3446585845452
+4546657867536
+1438598798454
+4457876987766
+3637877979653
+4654967986887
+4564679986453
+1224686865563
+2546548887735
+4322674655533\
+";
 
-        // assert_eq!(pt1(puzzle_input), 1320);
+        assert_eq!(pt1(puzzle_input), 102);
     }
 
     #[test]
