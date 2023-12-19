@@ -130,12 +130,6 @@ impl Platform {
             })
             .sum()
     }
-
-    fn print(&self) {
-        for row in &self.grid {
-            println!("{:?}", row);
-        }
-    }
 }
 
 // -------------------------------------------------------
@@ -152,7 +146,7 @@ fn pt1(input: &str) -> usize {
 fn pt2(input: &str, cycles: usize) -> usize {
     let mut platform = Platform::from(input);
 
-    for i in 0..cycles {
+    for _ in 0..cycles {
         platform.cycle();
     }
 

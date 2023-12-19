@@ -12,11 +12,11 @@ use crate::read_input;
 // Main Program Logic
 // -------------------------------------------------------
 
-fn pt1(input: &str) -> u32 {
+fn pt1(_input: &str) -> u32 {
     0
 }
 
-fn pt2(input: &str) -> u32 {
+fn pt2(_input: &str) -> u32 {
     0
 }
 
@@ -34,18 +34,18 @@ pub fn day18() {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
+    // use super::*;
 
     #[test]
     fn test_pt1() {
-        let puzzle_input = "";
+        // let puzzle_input = "";
 
         // assert_eq!(pt1(puzzle_input), 1320);
     }
 
     #[test]
     fn test_pt2() {
-        let puzzle_input = "";
+        // let puzzle_input = "";
 
         // assert_eq!(pt2(puzzle_input), 145);
     }

@@ -95,7 +95,7 @@ impl Hand {
             .map(|(_, count)| count.to_string().parse::<u32>().unwrap())
             .collect();
 
-        let mut hand: Vec<Card> = cards.chars().map(|c| Card::from(c)).collect();
+        let hand: Vec<Card> = cards.chars().map(|c| Card::from(c)).collect();
 
         match counts.len() {
             1 => Self::FiveOfAKind(hand),
@@ -109,19 +109,6 @@ impl Hand {
             },
             4 => Self::OnePair(hand),
             5 => Self::HighCard(hand),
-            _ => panic!("Invalid hand!"),
-        }
-    }
-
-    fn cards(&self) -> &Vec<Card> {
-        match &self {
-            Self::FiveOfAKind(cards) => cards,
-            Self::FourOfAKind(cards) => cards,
-            Self::FullHouse(cards) => cards,
-            Self::ThreeOfAKind(cards) => cards,
-            Self::TwoPair(cards) => cards,
-            Self::OnePair(cards) => cards,
-            Self::HighCard(cards) => cards,
             _ => panic!("Invalid hand!"),
         }
     }
