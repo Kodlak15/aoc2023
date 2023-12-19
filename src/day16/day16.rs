@@ -59,7 +59,20 @@ impl Beam {
     }
 
     fn reflect(&self, mirror: char) -> Self {
-        *self
+        match Mirror::from(mirror) {
+            Mirror::Positive => match self {
+                Beam::Up(coords) => Beam::Right(*coords),
+                Beam::Down(coords) => Beam::Left(*coords),
+                Beam::Left(coords) => Beam::Down(*coords),
+                Beam::Right(coords) => Beam::Up(*coords),
+            },
+            Mirror::Negative => match self {
+                Beam::Up(coords) => Beam::Left(*coords),
+                Beam::Down(coords) => Beam::Right(*coords),
+                Beam::Left(coords) => Beam::Up(*coords),
+                Beam::Right(coords) => Beam::Down(*coords),
+            },
+        }
     }
 
     fn split(&self, splitter: char) -> Vec<Self> {
