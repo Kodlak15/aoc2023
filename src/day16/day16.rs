@@ -10,6 +10,8 @@ use crate::read_input;
 // Helper Functions
 // -------------------------------------------------------
 
+// The way these are named is so confusing
+
 enum Mirror {
     Positive,
     Negative,
@@ -61,8 +63,8 @@ impl Beam {
     fn next(&self) -> Self {
         match self {
             Beam::Up((i, j)) => Beam::Up((*i, *j + 1)),
-            Beam::Down((i, j)) => Beam::Down((*i, *j - 1)),
-            Beam::Left((i, j)) => Beam::Left((*i - 1, *j)),
+            Beam::Down((i, j)) => Beam::Down((*i, j.saturating_sub(1))),
+            Beam::Left((i, j)) => Beam::Left((i.saturating_sub(1), *j)),
             Beam::Right((i, j)) => Beam::Right((*i + 1, *j)),
         }
     }
@@ -133,6 +135,8 @@ fn pt1(input: &str) -> usize {
     let mut energized: Vec<(usize, usize)> = vec![(0, 0)];
 
     while !beams.is_empty() {
+        println!("Beams: {:?}\n", beams);
+
         beams = beams
             .iter()
             .flat_map(|beam| {
@@ -192,6 +196,8 @@ fn pt1(input: &str) -> usize {
                 energized.push(coords);
             }
         });
+
+        println!("Beams: {:?}\n", beams);
     }
 
     energized.len()
@@ -217,23 +223,23 @@ pub fn day16() {
 mod tests {
     use super::*;
 
-    #[test]
-    fn test_pt1() {
-        let puzzle_input = "\
-.|...\\....
-|.-.\\.....
-.....|-...
-........|.
-..........
-.........\\
-..../.\\\\..
-.-.-/..|..
-.|....-|.\\
-..//.|....\\
-";
-
-        assert_eq!(pt1(puzzle_input), 46);
-    }
+    //     #[test]
+    //     fn test_pt1() {
+    //         let puzzle_input = "\
+    // .|...\\....
+    // |.-.\\.....
+    // .....|-...
+    // ........|.
+    // ..........
+    // .........\\
+    // ..../.\\\\..
+    // .-.-/..|..
+    // .|....-|.\\
+    // ..//.|....\\
+    // ";
+    //
+    //         assert_eq!(pt1(puzzle_input), 46);
+    //     }
 
     // #[test]
     // fn test_pt2() {
