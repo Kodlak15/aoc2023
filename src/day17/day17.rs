@@ -28,6 +28,12 @@ struct Edge {
     weight: u32,
 }
 
+impl Edge {
+    fn from(from: Node, to: Node, weight: u32) -> Self {
+        Self { from, to, weight }
+    }
+}
+
 struct Graph {
     nodes: Vec<Node>,
     edges: Vec<Edge>,
@@ -35,25 +41,28 @@ struct Graph {
 
 impl Graph {
     fn from(input: &str) -> Self {
-        let nodes: Vec<Node> = input
+        let grid: Vec<Vec<u32>> = input
             .lines()
-            .enumerate()
-            .flat_map(|(i, line)| {
+            .map(|line| {
                 line.chars()
-                    .enumerate()
-                    .map(|(j, c)| {
-                        let loss: u32 = c.to_digit(10).expect("Could not parse character as u32!");
-
-                        Node::from(i, j, loss)
-                    })
-                    .collect::<Vec<Node>>()
+                    .map(|c| c.to_digit(10).expect("Could not change character to u32!"))
+                    .collect()
             })
             .collect();
 
-        Self {
-            nodes: vec![],
-            edges: vec![],
-        }
+        let nrows = grid.len();
+        let ncols = grid[0].len();
+
+        let mut nodes: Vec<Node> = Vec::new();
+        let mut edges: Vec<Edge> = Vec::new();
+
+        (0..nrows).for_each(|row| {
+            (0..ncols).for_each(|col| {
+                let adjacent = adjacent_coords(row, col, nrows, ncols);
+            })
+        });
+
+        Self { nodes, edges }
     }
 }
 
@@ -61,11 +70,35 @@ impl Graph {
 // Helper Functions
 // -------------------------------------------------------
 
+fn adjacent_coords(row: usize, col: usize, nrows: usize, ncols: usize) -> Vec<(usize, usize)> {
+    let mut adjacent: Vec<(usize, usize)> = Vec::new();
+
+    if row > 0 {
+        adjacent.push((row - 1, col))
+    }
+
+    if row < nrows - 1 {
+        adjacent.push((row + 1, col))
+    }
+
+    if col > 0 {
+        adjacent.push((row, col - 1))
+    }
+
+    if col < ncols - 1 {
+        adjacent.push((row, col + 1))
+    }
+
+    adjacent
+}
+
 // -------------------------------------------------------
 // Main Program Logic
 // -------------------------------------------------------
 
 fn pt1(input: &str) -> u32 {
+    let graph = Graph::from(input);
+
     0
 }
 
