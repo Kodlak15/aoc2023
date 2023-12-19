@@ -118,119 +118,8 @@ impl Beam {
 // Helper Functions
 // -------------------------------------------------------
 
-fn helper(beams: &mut HashSet<Beam>, grid: Vec<Vec<char>>) -> () {
+fn count_energized_tiles(mut beams: HashSet<Beam>, grid: Vec<Vec<char>>) -> usize {
     let mut seen: HashSet<Beam> = beams.clone();
-
-    let nrows = grid.len();
-    let ncols = grid[0].len();
-
-    let mut energized: HashSet<(usize, usize)> = HashSet::new();
-    energized.insert((0, 0));
-
-    while !beams.is_empty() {
-        beams = beams
-            .iter()
-            .flat_map(|beam| {
-                let (i, j) = beam.coords();
-                let c = grid[i][j];
-
-                let new_beams: Vec<Beam> = match c {
-                    '.' => vec![beam.next()]
-                        .iter()
-                        .filter_map(|new_beam| {
-                            match new_beam.coords() != (i, j) && !seen.contains(new_beam) {
-                                true => {
-                                    seen.insert(*new_beam);
-                                    Some(*new_beam)
-                                }
-                                false => None,
-                            }
-                        })
-                        .collect(),
-                    '/' => vec![beam.reflect('/')]
-                        .iter()
-                        .filter_map(|new_beam| {
-                            match new_beam.coords() != (i, j) && !seen.contains(new_beam) {
-                                true => {
-                                    seen.insert(*new_beam);
-                                    Some(*new_beam)
-                                }
-                                false => None,
-                            }
-                        })
-                        .collect(),
-                    '\\' => vec![beam.reflect('\\')]
-                        .iter()
-                        .filter_map(|new_beam| {
-                            match new_beam.coords() != (i, j) && !seen.contains(new_beam) {
-                                true => {
-                                    seen.insert(*new_beam);
-                                    Some(*new_beam)
-                                }
-                                false => None,
-                            }
-                        })
-                        .collect(),
-                    '|' => beam
-                        .split('|')
-                        .iter()
-                        .filter_map(|new_beam| {
-                            match new_beam.coords() != (i, j) && !seen.contains(new_beam) {
-                                true => {
-                                    seen.insert(*new_beam);
-                                    Some(*new_beam)
-                                }
-                                false => None,
-                            }
-                        })
-                        .collect(),
-                    '-' => beam
-                        .split('-')
-                        .iter()
-                        .filter_map(|new_beam| {
-                            match new_beam.coords() != (i, j) && !seen.contains(new_beam) {
-                                true => {
-                                    seen.insert(*new_beam);
-                                    Some(*new_beam)
-                                }
-                                false => None,
-                            }
-                        })
-                        .collect(),
-                    _ => panic!("Invalid character found in grid!"),
-                };
-
-                new_beams
-            })
-            .filter_map(|beam| {
-                let (row, col) = beam.coords();
-
-                match row < nrows && col < ncols {
-                    true => Some(beam),
-                    false => None,
-                }
-            })
-            .collect();
-
-        beams.iter().for_each(|beam| {
-            energized.insert(beam.coords());
-        });
-    }
-}
-
-// -------------------------------------------------------
-// Main Program Logic
-// -------------------------------------------------------
-
-fn pt1(input: &str) -> usize {
-    let mut beams: HashSet<Beam> = HashSet::new();
-    beams.insert(Beam::Right((0, 0)));
-    let mut seen: HashSet<Beam> = beams.clone();
-
-    let grid: Vec<Vec<char>> = input
-        .lines()
-        .map(|line| line.chars().collect::<Vec<char>>())
-        .collect();
 
     let nrows = grid.len();
     let ncols = grid[0].len();
@@ -329,6 +218,22 @@ fn pt1(input: &str) -> usize {
     }
 
     energized.len()
+}
+
+// -------------------------------------------------------
+// Main Program Logic
+// -------------------------------------------------------
+
+fn pt1(input: &str) -> usize {
+    let mut beams: HashSet<Beam> = HashSet::new();
+    beams.insert(Beam::Right((0, 0)));
+
+    let grid: Vec<Vec<char>> = input
+        .lines()
+        .map(|line| line.chars().collect::<Vec<char>>())
+        .collect();
+
+    count_energized_tiles(beams, grid)
 }
 
 fn pt2(_input: &str) -> u32 {
