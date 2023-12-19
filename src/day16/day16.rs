@@ -125,7 +125,9 @@ fn count_energized_tiles(mut beams: HashSet<Beam>, grid: Vec<Vec<char>>) -> usiz
     let ncols = grid[0].len();
 
     let mut energized: HashSet<(usize, usize)> = HashSet::new();
-    energized.insert((0, 0));
+    for beam in &beams {
+        energized.insert(beam.coords());
+    }
 
     while !beams.is_empty() {
         beams = beams
@@ -220,24 +222,62 @@ fn count_energized_tiles(mut beams: HashSet<Beam>, grid: Vec<Vec<char>>) -> usiz
     energized.len()
 }
 
+fn get_starting_beams(grid: Vec<Vec<char>>) -> Vec<HashSet<Beam>> {
+    let nrows = grid.len();
+    let ncols = grid[0].len();
+
+    let mut starting_beams: Vec<HashSet<Beam>> = Vec::new();
+
+    (0..nrows).for_each(|i| {
+        let mut beams: HashSet<Beam> = HashSet::new();
+        beams.insert(Beam::Right((i, 0)));
+        starting_beams.push(beams);
+        let mut beams: HashSet<Beam> = HashSet::new();
+        beams.insert(Beam::Left((i, ncols - 1)));
+        starting_beams.push(beams);
+    });
+
+    (0..ncols).for_each(|j| {
+        let mut beams: HashSet<Beam> = HashSet::new();
+        beams.insert(Beam::Down((0, j)));
+        starting_beams.push(beams);
+        let mut beams: HashSet<Beam> = HashSet::new();
+        beams.insert(Beam::Up((nrows - 1, j)));
+        starting_beams.push(beams);
+    });
+
+    starting_beams
+}
+
 // -------------------------------------------------------
 // Main Program Logic
 // -------------------------------------------------------
 
 fn pt1(input: &str) -> usize {
-    let mut beams: HashSet<Beam> = HashSet::new();
-    beams.insert(Beam::Right((0, 0)));
-
     let grid: Vec<Vec<char>> = input
         .lines()
         .map(|line| line.chars().collect::<Vec<char>>())
         .collect();
 
+    let mut beams: HashSet<Beam> = HashSet::new();
+    beams.insert(Beam::Right((0, 0)));
+
     count_energized_tiles(beams, grid)
 }
 
-fn pt2(_input: &str) -> u32 {
-    0
+fn pt2(input: &str) -> usize {
+    let grid: Vec<Vec<char>> = input
+        .lines()
+        .map(|line| line.chars().collect::<Vec<char>>())
+        .collect();
+
+    let starting_beams = get_starting_beams(grid.clone());
+
+    starting_beams
+        .iter()
+        .map(|beams| count_energized_tiles(beams.clone(), grid.clone()))
+        .max()
+        .expect("Could not unwrap maximum energized tiles count!")
 }
 
 pub fn day16() {
@@ -274,10 +314,21 @@ mod tests {
         assert_eq!(pt1(puzzle_input), 46);
     }
 
-    // #[test]
-    // fn test_pt2() {
-    //     let puzzle_input = "rn=1,cm-,qp=3,cm=2,qp-,pc=4,ot=9,ab=5,pc-,pc=6,ot=7";
-    //
-    //     assert_eq!(pt2(puzzle_input), 145);
-    // }
+    #[test]
+    fn test_pt2() {
+        let puzzle_input = "\
+.|...\\....
+|.-.\\.....
+.....|-...
+........|.
+..........
+.........\\
+..../.\\\\..
+.-.-/..|..
+.|....-|.\\
+..//.|....\\
+";
+
+        assert_eq!(pt2(puzzle_input), 51);
+    }
 }
