@@ -10,6 +10,36 @@ use crate::read_input;
 // Helper Functions
 // -------------------------------------------------------
 
+enum Mirror {
+    Positive,
+    Negative,
+}
+
+impl Mirror {
+    fn from(c: char) -> Self {
+        match c {
+            '/' => Self::Positive,
+            '\\' => Self::Negative,
+            _ => panic!("Invalid character for type 'Mirror'!"),
+        }
+    }
+}
+
+enum Splitter {
+    Horizontal,
+    Vertical,
+}
+
+impl Splitter {
+    fn from(c: char) -> Self {
+        match c {
+            '-' => Self::Horizontal,
+            '|' => Self::Vertical,
+            _ => panic!("Invalid character for type 'Splitter'"),
+        }
+    }
+}
+
 #[derive(Debug, Clone, Copy)]
 enum Beam {
     Up((usize, usize)),
@@ -26,6 +56,14 @@ impl Beam {
             Beam::Left(coords) => *coords,
             Beam::Right(coords) => *coords,
         }
+    }
+
+    fn reflect(&self, mirror: char) -> Self {
+        *self
+    }
+
+    fn split(&self, splitter: char) -> Vec<Self> {
+        vec![]
     }
 }
 
