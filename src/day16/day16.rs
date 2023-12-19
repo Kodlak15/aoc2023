@@ -122,23 +122,37 @@ fn pt1(input: &str) -> u32 {
 
     while !beams.is_empty() {
         //
-        beams.iter().map(|beam| {
-            let (i, j) = beam.coords();
-
-            // match grid[i][j] {}
-        });
-
         beams = beams
             .iter()
+            .flat_map(|beam| {
+                let (i, j) = beam.coords();
+
+                match grid[i][j] {
+                    '.' => vec![beam.next()],
+                    '/' => vec![beam.reflect('/')],
+                    '\\' => vec![beam.reflect('\\')],
+                    '|' => beam.split('|'),
+                    '-' => beam.split('-'),
+                    _ => panic!("Invalid character found in grid!"),
+                }
+            })
             .filter_map(|beam| {
                 let (row, col) = beam.coords();
 
                 match row < nrows && col < ncols {
-                    true => Some(*beam),
+                    true => Some(beam),
                     false => None,
                 }
             })
-            .collect()
+            .collect();
+
+        beams.iter().for_each(|beam| {
+            let coords = beam.coords();
+
+            if !energized.contains(&coords) {
+                energized.push(coords);
+            }
+        });
     }
 
     0
@@ -162,13 +176,24 @@ pub fn day16() {
 
 #[cfg(test)]
 mod tests {
-    // use super::*;
+    use super::*;
 
     #[test]
     fn test_pt1() {
-        // let puzzle_input = "";
+        let puzzle_input = "\
+.|...\\....
+|.-.\\.....
+.....|-...
+........|.
+..........
+.........\\
+..../.\\\\..
+.-.-/..|..
+.|....-|.\\
+..//.|....\\
+";
 
-        // assert_eq!(pt1(puzzle_input), 1320);
+        assert_eq!(pt1(puzzle_input), 46);
     }
 
     // #[test]
