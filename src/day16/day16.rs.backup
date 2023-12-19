@@ -58,28 +58,46 @@ impl Beam {
         }
     }
 
-    fn next(&self) -> Self {
+    fn next(&self) -> Vec<Self> {
         match self {
-            Beam::Up((i, j)) => Beam::Up((*i, *j + 1)),
-            Beam::Down((i, j)) => Beam::Down((*i, *j - 1)),
-            Beam::Left((i, j)) => Beam::Left((*i - 1, *j)),
-            Beam::Right((i, j)) => Beam::Right((*i + 1, *j)),
+            Beam::Up((i, j)) => vec![Beam::Up((*i, *j + 1))],
+            Beam::Down((i, j)) => match *j > 0 {
+                true => vec![Beam::Down((*i, *j - 1))],
+                false => vec![],
+            },
+            Beam::Left((i, j)) => match *i > 0 {
+                true => vec![Beam::Left((*i - 1, *j))],
+                false => vec![],
+            },
+            Beam::Right((i, j)) => vec![Beam::Right((*i + 1, *j))],
         }
     }
 
-    fn reflect(&self, mirror: char) -> Self {
+    fn reflect(&self, mirror: char) -> Vec<Self> {
         match Mirror::from(mirror) {
             Mirror::Positive => match self {
-                Beam::Up((i, j)) => Beam::Right((*i + 1, *j)),
-                Beam::Down((i, j)) => Beam::Left((i.saturating_sub(1), *j)),
-                Beam::Left((i, j)) => Beam::Down((*i, j.saturating_sub(1))),
-                Beam::Right((i, j)) => Beam::Up((*i, *j + 1)),
+                Beam::Up((i, j)) => vec![Beam::Right((*i + 1, *j))],
+                Beam::Down((i, j)) => match *j > 0 {
+                    true => vec![Beam::Left((*i - 1, *j))],
+                    false => vec![],
+                },
+                Beam::Left((i, j)) => match *i > 0 {
+                    true => vec![Beam::Down((*i, *j - 1))],
+                    false => vec![],
+                },
+                Beam::Right((i, j)) => vec![Beam::Up((*i, *j + 1))],
             },
             Mirror::Negative => match self {
-                Beam::Up((i, j)) => Beam::Left((i.saturating_sub(1), *j)),
-                Beam::Down((i, j)) => Beam::Right((*i + 1, *j)),
-                Beam::Left((i, j)) => Beam::Up((*i, *j + 1)),
-                Beam::Right((i, j)) => Beam::Down((*i, j.saturating_sub(1))),
+                Beam::Up((i, j)) => match *i > 0 {
+                    true => vec![Beam::Left((*i - 1, *j))],
+                    false => vec![],
+                },
+                Beam::Down((i, j)) => vec![Beam::Right((*i + 1, *j))],
+                Beam::Left((i, j)) => vec![Beam::Up((*i, *j + 1))],
+                Beam::Right((i, j)) => match *j > 0 {
+                    true => vec![Beam::Down((*i, *j - 1))],
+                    false => vec![],
+                },
             },
         }
     }
@@ -88,26 +106,32 @@ impl Beam {
         match Splitter::from(splitter) {
             Splitter::Vertical => match self {
                 Beam::Up((i, j)) => vec![Beam::Up((*i, *j + 1))],
-                Beam::Down((i, j)) => vec![Beam::Down((*i, j.saturating_sub(1)))],
-                Beam::Left((i, j)) => vec![
-                    Beam::Up((*i, *j + 1)),
-                    Beam::Down((*i, j.saturating_sub(1))),
-                ],
-                Beam::Right((i, j)) => vec![
-                    Beam::Up((*i, *j + 1)),
-                    Beam::Down((*i, j.saturating_sub(1))),
-                ],
+                Beam::Down((i, j)) => match *j > 0 {
+                    true => vec![Beam::Down((*i, *j - 1))],
+                    false => vec![],
+                },
+                Beam::Left((i, j)) => match *j > 0 {
+                    true => vec![Beam::Up((*i, *j + 1)), Beam::Down((*i, *j - 1))],
+                    false => vec![Beam::Up((*i, *j + 1))],
+                },
+                Beam::Right((i, j)) => match *j > 0 {
+                    true => vec![Beam::Up((*i, *j + 1)), Beam::Down((*i, *j - 1))],
+                    false => vec![Beam::Up((*i, *j + 1))],
+                },
             },
             Splitter::Horizontal => match self {
-                Beam::Up((i, j)) => vec![
-                    Beam::Left((i.saturating_sub(1), *j)),
-                    Beam::Right((*i + 1, *j)),
-                ],
-                Beam::Down((i, j)) => vec![
-                    Beam::Left((i.saturating_sub(1), *j)),
-                    Beam::Right((*i + 1, *j)),
-                ],
-                Beam::Left((i, j)) => vec![Beam::Left((i.saturating_sub(1), *j))],
+                Beam::Up((i, j)) => match *i > 0 {
+                    true => vec![Beam::Left((*i - 1, *j)), Beam::Right((*i + 1, *j))],
+                    false => vec![Beam::Right((*i + 1, *j))],
+                },
+                Beam::Down((i, j)) => match *i > 0 {
+                    true => vec![Beam::Left((*i - 1, *j)), Beam::Right((*i + 1, *j))],
+                    false => vec![Beam::Right((*i + 1, *j))],
+                },
+                Beam::Left((i, j)) => match *i > 0 {
+                    true => vec![Beam::Left((*i - 1, *j))],
+                    false => vec![],
+                },
                 Beam::Right((i, j)) => vec![Beam::Right((*i + 1, *j))],
             },
         }
@@ -138,40 +162,12 @@ fn pt1(input: &str) -> usize {
             .flat_map(|beam| {
                 let (i, j) = beam.coords();
 
-                let c = grid[i][j];
-
-                match c {
-                    '.' => vec![beam.next()],
-                    '/' => vec![beam.reflect('/')]
-                        .iter()
-                        .filter_map(|new_beam| match new_beam.coords() != (i, j) {
-                            true => Some(*new_beam),
-                            false => None,
-                        })
-                        .collect(),
-                    '\\' => vec![beam.reflect('\\')]
-                        .iter()
-                        .filter_map(|new_beam| match new_beam.coords() != (i, j) {
-                            true => Some(*new_beam),
-                            false => None,
-                        })
-                        .collect(),
-                    '|' => beam
-                        .split('|')
-                        .iter()
-                        .filter_map(|new_beam| match new_beam.coords() != (i, j) {
-                            true => Some(*new_beam),
-                            false => None,
-                        })
-                        .collect(),
-                    '-' => beam
-                        .split('-')
-                        .iter()
-                        .filter_map(|new_beam| match new_beam.coords() != (i, j) {
-                            true => Some(*new_beam),
-                            false => None,
-                        })
-                        .collect(),
+                match grid[i][j] {
+                    '.' => beam.next(),
+                    '/' => beam.reflect('/'),
+                    '\\' => beam.reflect('\\'),
+                    '|' => beam.split('|'),
+                    '-' => beam.split('-'),
                     _ => panic!("Invalid character found in grid!"),
                 }
             })
@@ -184,6 +180,8 @@ fn pt1(input: &str) -> usize {
                 }
             })
             .collect();
+
+        println!("{:?}\n", beams);
 
         beams.iter().for_each(|beam| {
             let coords = beam.coords();
