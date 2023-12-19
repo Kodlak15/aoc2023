@@ -26,15 +26,15 @@ impl Mirror {
 }
 
 enum Splitter {
-    Horizontal,
     Vertical,
+    Horizontal,
 }
 
 impl Splitter {
     fn from(c: char) -> Self {
         match c {
-            '-' => Self::Horizontal,
             '|' => Self::Vertical,
+            '-' => Self::Horizontal,
             _ => panic!("Invalid character for type 'Splitter'"),
         }
     }
@@ -76,7 +76,20 @@ impl Beam {
     }
 
     fn split(&self, splitter: char) -> Vec<Self> {
-        vec![]
+        match Splitter::from(splitter) {
+            Splitter::Vertical => match self {
+                Beam::Up(coords) => vec![Beam::Up(*coords)],
+                Beam::Down(coords) => vec![Beam::Down(*coords)],
+                Beam::Left(coords) => vec![Beam::Up(*coords), Beam::Down(*coords)],
+                Beam::Right(coords) => vec![Beam::Up(*coords), Beam::Down(*coords)],
+            },
+            Splitter::Horizontal => match self {
+                Beam::Up(coords) => vec![Beam::Left(*coords), Beam::Right(*coords)],
+                Beam::Down(coords) => vec![Beam::Left(*coords), Beam::Right(*coords)],
+                Beam::Left(coords) => vec![Beam::Left(*coords)],
+                Beam::Right(coords) => vec![Beam::Right(*coords)],
+            },
+        }
     }
 }
 
