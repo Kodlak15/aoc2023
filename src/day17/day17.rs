@@ -37,6 +37,7 @@ impl Edge {
 }
 
 struct Graph {
+    start: Node,
     nodes: HashSet<Node>,
     edges: HashSet<Edge>,
 }
@@ -54,6 +55,8 @@ impl Graph {
 
         let nrows = grid.len();
         let ncols = grid[0].len();
+
+        let start = Node::from(0, 0, grid[0][0]);
 
         let mut nodes: HashSet<Node> = HashSet::new();
         let mut edges: HashSet<Edge> = HashSet::new();
@@ -81,7 +84,11 @@ impl Graph {
 
         assert!(nodes.len() == nrows * ncols);
 
-        Self { nodes, edges }
+        Self {
+            start,
+            nodes,
+            edges,
+        }
     }
 }
 
@@ -118,7 +125,12 @@ fn adjacent_coords(row: usize, col: usize, nrows: usize, ncols: usize) -> Vec<(u
 fn pt1(input: &str) -> u32 {
     let graph = Graph::from(input);
 
-    println!("Nodes: {:?}", graph.nodes);
+    println!("Start: {:?}", graph.start);
+
+    // let mut losses: HashSet<Node, u32>
+
+    // println!("Nodes: {:?}", graph.nodes);
+    // println!("Edges: {:?}", graph.edges);
 
     0
 }
