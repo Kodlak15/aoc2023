@@ -2,7 +2,7 @@
 // Advent of Code 2023 - Day 17
 // -------------------------------------------------------
 
-use std::rc::Rc;
+use std::collections::HashSet;
 
 use crate::read_input;
 
@@ -10,7 +10,7 @@ use crate::read_input;
 // Custom Data Structures
 // -------------------------------------------------------
 
-#[derive(PartialEq, Clone, Copy)]
+#[derive(Eq, Hash, PartialEq, Clone, Copy, Debug)]
 struct Node {
     row: usize,
     col: usize,
@@ -23,7 +23,7 @@ impl Node {
     }
 }
 
-#[derive(PartialEq)]
+#[derive(Eq, Hash, PartialEq, Debug)]
 struct Edge {
     from: Node,
     to: Node,
@@ -37,8 +37,8 @@ impl Edge {
 }
 
 struct Graph {
-    nodes: Vec<Node>,
-    edges: Vec<Edge>,
+    nodes: HashSet<Node>,
+    edges: HashSet<Edge>,
 }
 
 impl Graph {
@@ -55,40 +55,31 @@ impl Graph {
         let nrows = grid.len();
         let ncols = grid[0].len();
 
-        let mut nodes: Vec<Node> = Vec::new();
-        let mut edges: Vec<Edge> = Vec::new();
+        let mut nodes: HashSet<Node> = HashSet::new();
+        let mut edges: HashSet<Edge> = HashSet::new();
 
         (0..nrows).for_each(|row| {
             (0..ncols).for_each(|col| {
                 let u = Node::from(row, col, grid[row][col]);
+                nodes.insert(u);
 
                 let adjacent_coords = adjacent_coords(row, col, nrows, ncols);
                 let adjacent_nodes = adjacent_coords
                     .iter()
                     .map(|(i, j)| Node::from(*i, *j, grid[*i][*j]));
 
-                if !nodes.contains(&u) {
-                    nodes.push(u);
-                }
-
                 adjacent_nodes.for_each(|v| {
-                    if !nodes.contains(&v) {
-                        nodes.push(v)
-                    }
+                    nodes.insert(v);
 
                     let e1 = Edge::from(u, v, v.loss);
                     let e2 = Edge::from(v, u, u.loss);
-
-                    if !edges.contains(&e1) {
-                        edges.push(e1);
-                    }
-
-                    if !edges.contains(&e2) {
-                        edges.push(e2);
-                    }
+                    edges.insert(e1);
+                    edges.insert(e2);
                 })
             })
         });
+
+        assert!(nodes.len() == nrows * ncols);
 
         Self { nodes, edges }
     }
@@ -126,6 +117,8 @@ fn adjacent_coords(row: usize, col: usize, nrows: usize, ncols: usize) -> Vec<(u
 
 fn pt1(input: &str) -> u32 {
     let graph = Graph::from(input);
+
+    println!("Nodes: {:?}", graph.nodes);
 
     0
 }
