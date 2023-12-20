@@ -10,6 +10,12 @@ use std::{
 use crate::read_input;
 
 // -------------------------------------------------------
+// Global Constants
+// -------------------------------------------------------
+
+const MAXSTEPS: u8 = 3;
+
+// -------------------------------------------------------
 // Custom Data Structures
 // -------------------------------------------------------
 
@@ -20,6 +26,18 @@ enum Direction {
     Left,
     Right,
     Nil,
+}
+
+impl Direction {
+    fn reverse(&self) -> Self {
+        match self {
+            Self::Up => Self::Down,
+            Self::Down => Self::Up,
+            Self::Left => Self::Right,
+            Self::Right => Self::Left,
+            Self::Nil => Self::Nil,
+        }
+    }
 }
 
 #[derive(Eq, Hash, PartialEq, Clone, Copy, Debug)]
@@ -163,12 +181,15 @@ fn next_node(visited: &HashSet<Node>, losses: &HashMap<Node, u32>) -> Option<Nod
 // Main Program Logic
 // -------------------------------------------------------
 
+// Something is off with my logic here
+// Also look into using a priority queue rather than a hashmap to improve efficiency
+
 fn pt1(input: &str) -> u32 {
     let mut graph = Graph::from(input);
 
     let mut visited: HashSet<Node> = HashSet::new();
     let mut losses: HashMap<Node, u32> = graph.nodes.iter().map(|node| (*node, u32::MAX)).collect();
-    let mut paths: HashMap<Node, (Direction, usize)> = graph
+    let mut paths: HashMap<Node, (Direction, u8)> = graph
         .nodes
         .iter()
         .map(|node| (*node, (Direction::Nil, 0)))
@@ -186,21 +207,24 @@ fn pt1(input: &str) -> u32 {
         graph.nodes.remove(&current);
         visited.insert(current);
 
+        let (from_direction, steps) = paths[&current];
+
         graph
             .edges
             .iter()
-            .filter_map(|edge| match edge.from == current {
-                true => Some(*edge),
-                false => None,
+            .filter_map(|edge| {
+                match edge.from == current && edge.direction != from_direction.reverse() {
+                    true => Some(*edge),
+                    false => None,
+                }
             })
             .for_each(|edge| {
-                let (from_direction, steps) = paths[&edge.from];
                 let to_direction = edge.direction;
 
                 let loss_from = losses[&edge.from];
 
                 match to_direction == from_direction {
-                    true => match steps < 3 {
+                    true => match steps < MAXSTEPS {
                         true => {
                             if let Some(loss_to) = losses.get_mut(&edge.to) {
                                 let loss = loss_from.saturating_add(edge.weight);
