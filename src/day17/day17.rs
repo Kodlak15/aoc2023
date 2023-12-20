@@ -168,8 +168,6 @@ fn pt1(input: &str) -> u32 {
                     }
                 }
             });
-
-        // break;
     }
 
     losses[&graph.destination]
