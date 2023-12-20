@@ -23,7 +23,7 @@ impl Node {
     }
 }
 
-#[derive(Eq, Hash, PartialEq, Debug)]
+#[derive(Eq, Hash, PartialEq, Debug, Clone, Copy)]
 struct Edge {
     from: Node,
     to: Node,
@@ -36,6 +36,7 @@ impl Edge {
     }
 }
 
+#[derive(Debug)]
 struct Graph {
     source: Node,
     nodes: HashSet<Node>,
@@ -126,10 +127,22 @@ fn adjacent_coords(row: usize, col: usize, nrows: usize, ncols: usize) -> Vec<(u
 // -------------------------------------------------------
 
 fn pt1(input: &str) -> u32 {
-    let graph = Graph::from(input);
+    let mut graph = Graph::from(input);
 
     let mut visited: HashSet<Node> = HashSet::new();
     let mut losses: HashMap<Node, u32> = graph.nodes.iter().map(|node| (*node, u32::MAX)).collect();
+
+    while !graph.nodes.is_empty() {}
+
+    // let test: Vec<Edge> = graph
+    //     .edges
+    //     .iter()
+    //     .filter_map(|edge| match edge.from == graph.source {
+    //         true => Some(*edge),
+    //         false => None,
+    //     })
+    //     .collect();
+    // println!("Start edges: {:?}", test);
 
     0
 }
