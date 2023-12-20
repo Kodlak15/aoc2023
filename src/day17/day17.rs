@@ -132,7 +132,25 @@ fn pt1(input: &str) -> u32 {
     let mut visited: HashSet<Node> = HashSet::new();
     let mut losses: HashMap<Node, u32> = graph.nodes.iter().map(|node| (*node, u32::MAX)).collect();
 
-    while !graph.nodes.is_empty() {}
+    let mut current = graph.source;
+    if let Some(loss) = losses.get_mut(&current) {
+        *loss = 0;
+    }
+
+    while !graph.nodes.is_empty() {
+        graph.nodes.remove(&current);
+
+        let edges: Vec<Edge> = graph
+            .edges
+            .iter()
+            .filter_map(|edge| match edge.from == current {
+                true => Some(*edge),
+                false => None,
+            })
+            .collect();
+
+        break;
+    }
 
     // let test: Vec<Edge> = graph
     //     .edges
