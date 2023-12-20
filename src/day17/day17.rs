@@ -128,6 +128,7 @@ fn adjacent_coords(row: usize, col: usize, nrows: usize, ncols: usize) -> Vec<(u
 fn pt1(input: &str) -> u32 {
     let graph = Graph::from(input);
 
+    let mut visited: HashSet<Node> = HashSet::new();
     let mut losses: HashMap<Node, u32> = graph.nodes.iter().map(|node| (*node, u32::MAX)).collect();
 
     0
