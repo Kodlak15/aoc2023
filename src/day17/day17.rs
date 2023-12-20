@@ -2,7 +2,10 @@
 // Advent of Code 2023 - Day 17
 // -------------------------------------------------------
 
-use std::collections::{HashMap, HashSet};
+use std::{
+    collections::{HashMap, HashSet},
+    hash::Hash,
+};
 
 use crate::read_input;
 
@@ -204,13 +207,34 @@ fn pt1(input: &str) -> u32 {
                 false => None,
             })
             .for_each(|edge| {
+                let (from_direction, steps) = paths[&edge.from];
+                let to_direction = edge.direction;
+
                 let loss_from = losses[&edge.from];
 
-                if let Some(loss_to) = losses.get_mut(&edge.to) {
-                    let loss = loss_from.saturating_add(edge.weight);
+                match to_direction == from_direction {
+                    true => match steps < 3 {
+                        true => {
+                            if let Some(loss_to) = losses.get_mut(&edge.to) {
+                                let loss = loss_from.saturating_add(edge.weight);
 
-                    if *loss_to > loss {
-                        *loss_to = loss;
+                                if loss < *loss_to {
+                                    *loss_to = loss;
+                                    paths.insert(edge.to, (to_direction, steps + 1));
+                                }
+                            }
+                        }
+                        false => (), // Do nothing, exceeds limit of 3 consecutive steps in the same direction
+                    },
+                    false => {
+                        if let Some(loss_to) = losses.get_mut(&edge.to) {
+                            let loss = loss_from.saturating_add(edge.weight);
+
+                            if loss < *loss_to {
+                                *loss_to = loss;
+                                paths.insert(edge.to, (to_direction, 1));
+                            }
+                        }
                     }
                 }
             });
