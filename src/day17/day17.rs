@@ -163,8 +163,10 @@ fn pt1(input: &str) -> u32 {
                 let loss_from = losses[&edge.from];
 
                 if let Some(loss_to) = losses.get_mut(&edge.to) {
-                    if *loss_to > loss_from.saturating_add(edge.weight) {
-                        *loss_to = loss_from.saturating_add(edge.weight);
+                    let loss = loss_from.saturating_add(edge.weight);
+
+                    if *loss_to > loss {
+                        *loss_to = loss;
                     }
                 }
             });
