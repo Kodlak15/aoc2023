@@ -10,6 +10,7 @@ use crate::read_input;
 // Custom Data Structures
 // -------------------------------------------------------
 
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
 enum Direction {
     Up,
     Down,
@@ -36,11 +37,28 @@ struct Edge {
     from: Node,
     to: Node,
     weight: u32,
+    direction: Direction,
 }
 
 impl Edge {
     fn from(from: Node, to: Node, weight: u32) -> Self {
-        Self { from, to, weight }
+        let direction = match from.row != to.row {
+            true => match from.row < to.row {
+                true => Direction::Down,
+                false => Direction::Up,
+            },
+            false => match from.col < to.col {
+                true => Direction::Right,
+                false => Direction::Left,
+            },
+        };
+
+        Self {
+            from,
+            to,
+            weight,
+            direction,
+        }
     }
 }
 
