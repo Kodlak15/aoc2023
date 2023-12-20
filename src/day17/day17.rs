@@ -10,6 +10,14 @@ use crate::read_input;
 // Custom Data Structures
 // -------------------------------------------------------
 
+enum Direction {
+    Up,
+    Down,
+    Left,
+    Right,
+    Nil,
+}
+
 #[derive(Eq, Hash, PartialEq, Clone, Copy, Debug)]
 struct Node {
     row: usize,
@@ -140,14 +148,25 @@ fn pt1(input: &str) -> u32 {
 
     let mut visited: HashSet<Node> = HashSet::new();
     let mut losses: HashMap<Node, u32> = graph.nodes.iter().map(|node| (*node, u32::MAX)).collect();
+    let mut paths: HashMap<Node, (Direction, usize)> = HashMap::new();
 
     if let Some(loss) = losses.get_mut(&graph.source) {
         *loss = 0;
     }
 
+    if let Some(path) = paths.get_mut(&graph.source) {
+        *path = (Direction::Nil, 0);
+    }
+
+    // The path to an adjacent node is comprised of the path to the source node + the move required
+    // to get to the destination node, but it is only necessary to keep track of the direction
+    // most recently taken as well as the number of steps that have been taken in that direction
+    //
+    // -> If paths[source] = (Right, 2), then the path to the next node on the right is (Right, 3)
+    // -> If paths[source] = (Right, 2), then the path to the next node downwards is (Down, 1)
+
     while !graph.nodes.is_empty() {
         let current = next_node(&visited, &losses);
-        println!("Current: {:?}", current);
 
         graph.nodes.remove(&current);
         visited.insert(current);
