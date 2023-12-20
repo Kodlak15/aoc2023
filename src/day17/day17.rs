@@ -122,6 +122,15 @@ fn adjacent_coords(row: usize, col: usize, nrows: usize, ncols: usize) -> Vec<(u
     adjacent
 }
 
+fn next_node(visited: &HashSet<Node>, losses: &HashMap<Node, u32>) -> Node {
+    *losses
+        .iter()
+        .filter(|(node, _)| !visited.contains(node))
+        .min_by_key(|(_, &loss)| loss)
+        .expect("Could not unpack node!")
+        .0
+}
+
 // -------------------------------------------------------
 // Main Program Logic
 // -------------------------------------------------------
@@ -132,37 +141,38 @@ fn pt1(input: &str) -> u32 {
     let mut visited: HashSet<Node> = HashSet::new();
     let mut losses: HashMap<Node, u32> = graph.nodes.iter().map(|node| (*node, u32::MAX)).collect();
 
-    let mut current = graph.source;
-    if let Some(loss) = losses.get_mut(&current) {
+    if let Some(loss) = losses.get_mut(&graph.source) {
         *loss = 0;
     }
 
     while !graph.nodes.is_empty() {
-        graph.nodes.remove(&current);
+        let current = next_node(&visited, &losses);
+        println!("Current: {:?}", current);
 
-        let edges: Vec<Edge> = graph
+        graph.nodes.remove(&current);
+        visited.insert(current);
+
+        graph
             .edges
             .iter()
             .filter_map(|edge| match edge.from == current {
                 true => Some(*edge),
                 false => None,
             })
-            .collect();
+            .for_each(|edge| {
+                let loss_from = losses[&edge.from];
 
-        break;
+                if let Some(loss_to) = losses.get_mut(&edge.to) {
+                    if *loss_to > loss_from.saturating_add(edge.weight) {
+                        *loss_to = loss_from.saturating_add(edge.weight);
+                    }
+                }
+            });
+
+        // break;
     }
 
-    // let test: Vec<Edge> = graph
-    //     .edges
-    //     .iter()
-    //     .filter_map(|edge| match edge.from == graph.source {
-    //         true => Some(*edge),
-    //         false => None,
-    //     })
-    //     .collect();
-    // println!("Start edges: {:?}", test);
-
-    0
+    losses[&graph.destination]
 }
 
 fn pt2(_input: &str) -> u32 {
