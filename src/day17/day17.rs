@@ -148,7 +148,11 @@ fn pt1(input: &str) -> u32 {
 
     let mut visited: HashSet<Node> = HashSet::new();
     let mut losses: HashMap<Node, u32> = graph.nodes.iter().map(|node| (*node, u32::MAX)).collect();
-    let mut paths: HashMap<Node, (Direction, usize)> = HashMap::new();
+    let mut paths: HashMap<Node, (Direction, usize)> = graph
+        .nodes
+        .iter()
+        .map(|node| (*node, (Direction::Nil, 0)))
+        .collect();
 
     if let Some(loss) = losses.get_mut(&graph.source) {
         *loss = 0;
@@ -160,7 +164,10 @@ fn pt1(input: &str) -> u32 {
 
     // The path to an adjacent node is comprised of the path to the source node + the move required
     // to get to the destination node, but it is only necessary to keep track of the direction
-    // most recently taken as well as the number of steps that have been taken in that direction
+    // most recently taken as well as the number of consecutive steps that have been taken in that direction
+    //
+    // If the number of consecutive steps taken in some direction is 3 for some source node, then
+    // its set of possible destination nodes needs to be restricted
     //
     // -> If paths[source] = (Right, 2), then the path to the next node on the right is (Right, 3)
     // -> If paths[source] = (Right, 2), then the path to the next node downwards is (Down, 1)
