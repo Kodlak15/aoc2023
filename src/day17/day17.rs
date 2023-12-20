@@ -151,13 +151,12 @@ fn adjacent_coords(row: usize, col: usize, nrows: usize, ncols: usize) -> Vec<(u
     adjacent
 }
 
-fn next_node(visited: &HashSet<Node>, losses: &HashMap<Node, u32>) -> Node {
-    *losses
+fn next_node(visited: &HashSet<Node>, losses: &HashMap<Node, u32>) -> Option<Node> {
+    losses
         .iter()
         .filter(|(node, _)| !visited.contains(node))
         .min_by_key(|(_, &loss)| loss)
-        .expect("Could not unpack node!")
-        .0
+        .map(|(node, _)| *node)
 }
 
 // -------------------------------------------------------
@@ -183,19 +182,7 @@ fn pt1(input: &str) -> u32 {
         *path = (Direction::Nil, 0);
     }
 
-    // The path to an adjacent node is comprised of the path to the source node + the move required
-    // to get to the destination node, but it is only necessary to keep track of the direction
-    // most recently taken as well as the number of consecutive steps that have been taken in that direction
-    //
-    // If the number of consecutive steps taken in some direction is 3 for some source node, then
-    // its set of possible destination nodes needs to be restricted
-    //
-    // -> If paths[source] = (Right, 2), then the path to the next node on the right is (Right, 3)
-    // -> If paths[source] = (Right, 2), then the path to the next node downwards is (Down, 1)
-
-    while !graph.nodes.is_empty() {
-        let current = next_node(&visited, &losses);
-
+    while let Some(current) = next_node(&visited, &losses) {
         graph.nodes.remove(&current);
         visited.insert(current);
 
